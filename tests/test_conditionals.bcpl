@@ -1,0 +1,92 @@
+GET "libhdr"
+
+LET START() BE $(
+    LET A, B, C = 10, 20, 30
+
+    WRITES("Starting conditional tests...*N")
+
+    // Test 1: IF statement
+    WRITES("*NTest 1: IF statement*N")
+    IF A < B THEN WRITES("  A is less than B (Correct)*N")
+    IF A > B THEN WRITES("  A is greater than B (Incorrect)*N")
+
+    // Test 2: UNLESS statement
+    WRITES("*NTest 2: UNLESS statement*N")
+    UNLESS A > B THEN WRITES("  UNLESS A is greater than B (Correct)*N")
+    UNLESS A < B THEN WRITES("  UNLESS A is less than B (Incorrect)*N")
+
+    // Test 3: TEST ... THEN ... OR statement
+    WRITES("*NTest 3: TEST...THEN...OR*N")
+    TEST A = 10
+        THEN WRITES("  TEST: A is 10 (Correct)*N")
+        OR WRITES("  TEST: A is not 10 (Incorrect)*N")
+
+    TEST B = 10
+        THEN WRITES("  TEST: B is 10 (Incorrect)*N")
+        OR WRITES("  TEST: B is not 10 (Correct)*N")
+
+    // Test 4: Conditional Expression (E1 -> E2, E3)
+    WRITES("*NTest 4: Conditional Expression*N")
+    LET D = (A < B) -> 1, 0
+    IF D = 1 THEN WRITES("  (A < B) -> 1, 0 resulted in 1 (Correct)*N")
+
+    LET E = (A > B) -> 1, 0
+    IF E = 0 THEN WRITES("  (A > B) -> 1, 0 resulted in 0 (Correct)*N")
+
+    // Test 5: WHILE loop
+    WRITES("*NTest 5: WHILE loop*N")
+    LET I = 0
+    WHILE I < 3 DO $(
+        WRITES("  WHILE loop iteration: ")
+        WRITEN(I)
+        NEWLINE()
+        I := I + 1
+    $)
+
+    // Test 6: UNTIL loop
+    WRITES("*NTest 6: UNTIL loop*N")
+    I := 0
+    UNTIL I >= 3 DO $(
+        WRITES("  UNTIL loop iteration: ")
+        WRITEN(I)
+        NEWLINE()
+        I := I + 1
+    $)
+
+    // Test 7: FOR loop
+    WRITES("*NTest 7: FOR loop*N")
+    FOR J = 1 TO 3 DO $(
+        WRITES("  FOR loop iteration: ")
+        WRITEN(J)
+        NEWLINE()
+    $)
+
+    // Test 8: SWITCHON statement
+    WRITES("*NTest 8: SWITCHON statement*N")
+    FOR K = 1 TO 4 DO $(
+        WRITES("  Switching on: ")
+        WRITEN(K)
+        NEWLINE()
+        SWITCHON K INTO $(
+            CASE 1: $(
+                WRITES("    Case 1 matched*N")
+                ENDCASE
+            $)
+            CASE 2: $(
+                WRITES("    Case 2 matched*N")
+                ENDCASE
+            $)
+            CASE 3: $(
+                WRITES("    Case 3 matched*N")
+                ENDCASE
+            $)
+            DEFAULT: $(
+                WRITES("    Default case matched*N")
+                ENDCASE
+            $)
+        $)
+    $)
+
+    WRITES("*NConditional tests finished.*N")
+    FINISH
+$)

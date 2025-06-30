@@ -1,0 +1,78 @@
+GET "libhdr"
+
+// Iterative Factorial
+LET FACT_ITER(N) = VALOF $(
+    LET RESULT = 1
+    FOR I = 1 TO N DO $(
+        RESULT := RESULT * I
+    $)
+    RESULTIS RESULT
+$)
+
+// Recursive Factorial
+LET FACT_REC(N) = VALOF $(
+    IF N = 0 THEN RESULTIS 1
+    RESULTIS N * FACT_REC(N - 1)
+$)
+
+// Helper function with an accumulator
+LET FACT_TAIL(N, ACCUMULATOR) = VALOF $(
+    // Base case: if N is 0, the final result is in the accumulator.
+    IF N = 0 THEN RESULTIS ACCUMULATOR
+
+    // Recursive step: the call to FACT_TAIL is the very last action.
+    // All calculations are done *before* the call.
+    RESULTIS FACT_TAIL(N - 1, N * ACCUMULATOR)
+$)
+
+// Main function that kicks off the process
+LET FACT_TCO(N) = VALOF $(
+    // Start with an accumulator value of 1.
+    RESULTIS FACT_TAIL(N, 1)
+$)
+
+LET START() BE $(
+    WRITES("Testing Factorial Functions...*N")
+
+    WRITES("*NIterative Factorial:*N")
+    WRITES("FACT_ITER(0) = ")
+    WRITEN(FACT_ITER(0))
+    NEWLINE()
+
+    WRITES("FACT_ITER(1) = ")
+    WRITEN(FACT_ITER(1))
+    NEWLINE()
+
+    WRITES("FACT_ITER(5) = ")
+    WRITEN(FACT_ITER(5))
+    NEWLINE()
+
+    WRITES("*NRecursive Factorial:*N")
+    WRITES("FACT_REC(0) = ")
+    WRITEN(FACT_REC(0))
+    NEWLINE()
+
+    WRITES("FACT_REC(1) = ")
+    WRITEN(FACT_REC(1))
+    NEWLINE()
+
+    WRITES("FACT_REC(5) = ")
+    WRITEN(FACT_REC(5))
+    NEWLINE()
+
+    WRITES("*NTail-Recursive Factorial:*N")
+    WRITES("FACT_TCO(0) = ")
+    WRITEN(FACT_TCO(0))
+    NEWLINE()
+
+    WRITES("FACT_TCO(1) = ")
+    WRITEN(FACT_TCO(1))
+    NEWLINE()
+
+    WRITES("FACT_TCO(5) = ")
+    WRITEN(FACT_TCO(5))
+    NEWLINE()
+
+    WRITES("*NFactorial Tests Finished.*N")
+    FINISH
+$)

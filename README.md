@@ -62,24 +62,26 @@ The project is built with standard C++ tools.
 3.  **Compile a BCPL source file:**
     ```bash
     # Compile the test file to ARM64 assembly
-    ./bcpl_compiler tests/test_fact.bcpl -o tests/test_fact.s
+    ./bcpl_compiler --asm --debug tests/test_fact.bcpl  > tests/test_fact.s
     ```
 
-4.  **Assemble and link the output:**
+4.  ** TODO: Assemble and link the output:**
     ```bash
-    # Use the system assembler to create an object file
-    as -o tests/test_fact.o tests/test_fact.s
+    # Use the system assembler to create an object file - NOT YET :)
+    #as -o tests/test_fact.o tests/test_fact.s
 
     # Link the object file into an executable on macOS
-    ld -o test_fact tests/test_fact.o -lSystem -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -e _start
+    #ld -o test_fact tests/test_fact.o -lSystem -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -e _start
     ```
 
-5.  **Run the executable:**
+5.  ** TODO: Run the executable:**
     ```bash
     ./test_fact
     ```
 
-## Where are we? 
+## Where are we so far
+
+Generating text, we love text.
 
 ```C++
  compiler % ./build/compiler --debug --asm tests/test_fact.bcpl

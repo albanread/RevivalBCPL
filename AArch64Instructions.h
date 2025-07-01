@@ -8,6 +8,21 @@
 
 class LabelManager;
 
+/**
+ * AArch64 Instruction Generator and Binary Encoder
+ * 
+ * This class provides functionality for generating AArch64 assembly instructions
+ * and encoding them to binary machine code for JIT compilation.
+ * 
+ * The instruction encoding process works as follows:
+ * 1. Instructions are created with their binary encodings pre-computed
+ * 2. computeAddresses() assigns memory addresses to each instruction
+ * 3. resolveAllBranches() updates branch instruction encodings with correct offsets
+ * 4. encodeToBuffer() outputs the final binary machine code
+ * 
+ * Each instruction is exactly 4 bytes (32 bits) in AArch64, and the binary
+ * encoding follows the little-endian format required by the architecture.
+ */
 class AArch64Instructions {
 public:
     // Register definitions
@@ -39,6 +54,20 @@ public:
         bool isLoad() const { return (encoding & 0x3B000000) == 0x38000000; } // Simplified check for STR/LDR (immediate offset)
         void resolveLabel(int32_t offset) { encoding |= ((offset / 4) & 0x7FFFF) << 5; } // Simplified for B/BL
         std::string toString() const { return assembly; }
+        
+        /**
+         * Encode this instruction to binary machine code.
+         * Writes the 32-bit encoding to the provided buffer in little-endian format
+         * as required by AArch64 architecture.
+         * @param out Buffer to write the 4-byte instruction encoding to
+         */
+        void encode(uint8_t* out) const {
+            // AArch64 uses little-endian encoding
+            out[0] = static_cast<uint8_t>(encoding & 0xFF);
+            out[1] = static_cast<uint8_t>((encoding >> 8) & 0xFF);
+            out[2] = static_cast<uint8_t>((encoding >> 16) & 0xFF);
+            out[3] = static_cast<uint8_t>((encoding >> 24) & 0xFF);
+        }
     };
 
     void setPendingLabel(const std::string& label);
@@ -128,6 +157,30 @@ public:
     void resolveBranch(size_t instructionIndex, int32_t offset);
     void addUnresolvedBranch(const std::string& label);
     void resolveBranches(const LabelManager& labelManager);
+
+    /**
+     * Compute addresses for all instructions in the sequence.
+     * This pass assigns addresses to each instruction, enabling proper
+     * branch target resolution. Each AArch64 instruction is 4 bytes.
+     * @param baseAddress Starting address for the first instruction
+     */
+    void computeAddresses(size_t baseAddress = 0);
+    
+    /**
+     * Resolve all branch targets and update instruction encodings.
+     * This pass must be called after computeAddresses() and after all
+     * labels have been defined. It updates branch instruction encodings
+     * with the correct relative offsets to their targets.
+     */
+    void resolveAllBranches();
+    
+    /**
+     * Encode all instructions to a binary buffer.
+     * @param buffer Output buffer to write encoded instructions to
+     * @param bufferSize Size of the output buffer in bytes
+     * @return Number of bytes written to the buffer
+     */
+    size_t encodeToBuffer(uint8_t* buffer, size_t bufferSize) const;
 
     void clear();
     Instruction& at(size_t index);

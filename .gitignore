@@ -10,6 +10,7 @@ compiler
 # Test executables
 test_jit_memory_manager
 test_jit_memory_advanced
+test_instruction_encoding
 
 # IDE files
 .vscode/

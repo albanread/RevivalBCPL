@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm> // For std::sort
+#include <map>       // For std::map
 
 // Define static members
 const uint32_t AArch64Instructions::X0;
@@ -296,6 +297,64 @@ void AArch64Instructions::addUnresolvedBranch(const std::string& label) {
 
 void AArch64Instructions::resolveBranches(const LabelManager& labelManager) {
     // Placeholder implementation
+}
+
+void AArch64Instructions::computeAddresses(size_t baseAddress) {
+    size_t currentAddress = baseAddress;
+    for (auto& instr : instructions) {
+        instr.address = currentAddress;
+        currentAddress += 4; // Each AArch64 instruction is 4 bytes
+    }
+}
+
+void AArch64Instructions::resolveAllBranches() {
+    // Build a map of labels to their addresses
+    std::map<std::string, size_t> labelMap;
+    for (const auto& instr : instructions) {
+        if (instr.hasLabel) {
+            labelMap[instr.label] = instr.address;
+        }
+    }
+    
+    // Resolve branch targets
+    for (auto& instr : instructions) {
+        if (instr.needsLabelResolution) {
+            auto it = labelMap.find(instr.targetLabel);
+            if (it != labelMap.end()) {
+                size_t targetAddress = it->second;
+                int64_t offset = static_cast<int64_t>(targetAddress) - static_cast<int64_t>(instr.address);
+                
+                // Update the instruction encoding based on instruction type
+                uint32_t opcode = instr.encoding & 0xFC000000; // Extract opcode bits
+                
+                if (opcode == 0x14000000) { // B instruction
+                    instr.encoding |= ((offset / 4) & 0x03FFFFFF);
+                } else if ((opcode & 0xFE000000) == 0x54000000) { // Conditional branch (B.cond)
+                    instr.encoding |= (((offset / 4) & 0x0007FFFF) << 5);
+                } else if (opcode == 0x94000000) { // BL instruction
+                    instr.encoding |= ((offset / 4) & 0x03FFFFFF);
+                } else if ((opcode & 0xFF000000) == 0x34000000) { // CBZ/CBNZ
+                    instr.encoding |= (((offset / 4) & 0x0007FFFF) << 5);
+                }
+                
+                instr.needsLabelResolution = false;
+            }
+        }
+    }
+}
+
+size_t AArch64Instructions::encodeToBuffer(uint8_t* buffer, size_t bufferSize) const {
+    if (bufferSize < instructions.size() * 4) {
+        throw std::runtime_error("Buffer too small for instruction encoding");
+    }
+    
+    size_t bytesWritten = 0;
+    for (const auto& instr : instructions) {
+        instr.encode(buffer + bytesWritten);
+        bytesWritten += 4;
+    }
+    
+    return bytesWritten;
 }
 
 void AArch64Instructions::clear() {

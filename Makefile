@@ -155,12 +155,26 @@ test_jit_memory_advanced/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/build
 .PHONY : test_jit_memory_advanced/fast
 
+#=============================================================================
+# Target rules for targets named test_instruction_encoding
+
+# Build rule for target.
+test_instruction_encoding: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_instruction_encoding
+.PHONY : test_instruction_encoding
+
+# fast build rule for target.
+test_instruction_encoding/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_instruction_encoding.dir/build.make CMakeFiles/test_instruction_encoding.dir/build
+.PHONY : test_instruction_encoding/fast
+
 AArch64Instructions.o: AArch64Instructions.cpp.o
 .PHONY : AArch64Instructions.o
 
 # target to build an object file
 AArch64Instructions.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/AArch64Instructions.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_instruction_encoding.dir/build.make CMakeFiles/test_instruction_encoding.dir/AArch64Instructions.cpp.o
 .PHONY : AArch64Instructions.cpp.o
 
 AArch64Instructions.i: AArch64Instructions.cpp.i
@@ -169,6 +183,7 @@ AArch64Instructions.i: AArch64Instructions.cpp.i
 # target to preprocess a source file
 AArch64Instructions.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/AArch64Instructions.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_instruction_encoding.dir/build.make CMakeFiles/test_instruction_encoding.dir/AArch64Instructions.cpp.i
 .PHONY : AArch64Instructions.cpp.i
 
 AArch64Instructions.s: AArch64Instructions.cpp.s
@@ -177,6 +192,7 @@ AArch64Instructions.s: AArch64Instructions.cpp.s
 # target to generate assembly for a file
 AArch64Instructions.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/AArch64Instructions.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_instruction_encoding.dir/build.make CMakeFiles/test_instruction_encoding.dir/AArch64Instructions.cpp.s
 .PHONY : AArch64Instructions.cpp.s
 
 CodeGenerator.o: CodeGenerator.cpp.o
@@ -617,6 +633,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+test_instruction_encoding.o: test_instruction_encoding.cpp.o
+.PHONY : test_instruction_encoding.o
+
+# target to build an object file
+test_instruction_encoding.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_instruction_encoding.dir/build.make CMakeFiles/test_instruction_encoding.dir/test_instruction_encoding.cpp.o
+.PHONY : test_instruction_encoding.cpp.o
+
+test_instruction_encoding.i: test_instruction_encoding.cpp.i
+.PHONY : test_instruction_encoding.i
+
+# target to preprocess a source file
+test_instruction_encoding.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_instruction_encoding.dir/build.make CMakeFiles/test_instruction_encoding.dir/test_instruction_encoding.cpp.i
+.PHONY : test_instruction_encoding.cpp.i
+
+test_instruction_encoding.s: test_instruction_encoding.cpp.s
+.PHONY : test_instruction_encoding.s
+
+# target to generate assembly for a file
+test_instruction_encoding.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_instruction_encoding.dir/build.make CMakeFiles/test_instruction_encoding.dir/test_instruction_encoding.cpp.s
+.PHONY : test_instruction_encoding.cpp.s
+
 test_jit_memory_advanced.o: test_jit_memory_advanced.cpp.o
 .PHONY : test_jit_memory_advanced.o
 
@@ -674,6 +714,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... compiler"
+	@echo "... test_instruction_encoding"
 	@echo "... test_jit_memory_advanced"
 	@echo "... test_jit_memory_manager"
 	@echo "... AArch64Instructions.o"
@@ -733,6 +774,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... test_instruction_encoding.o"
+	@echo "... test_instruction_encoding.i"
+	@echo "... test_instruction_encoding.s"
 	@echo "... test_jit_memory_advanced.o"
 	@echo "... test_jit_memory_advanced.i"
 	@echo "... test_jit_memory_advanced.s"

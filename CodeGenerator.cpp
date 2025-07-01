@@ -158,6 +158,20 @@ void CodeGenerator::resolveLabels() {
     }
 }
 
+/**
+ * Compute instruction addresses and resolve all branch targets.
+ * This method performs the complete address assignment and branch resolution
+ * process required for binary code generation in JIT compilation.
+ * @param baseAddress Starting address for the first instruction
+ */
+void CodeGenerator::finalizeInstructionAddressing(size_t baseAddress) {
+    // Step 1: Compute addresses for all instructions
+    instructions.computeAddresses(baseAddress);
+    
+    // Step 2: Resolve all branch targets using the new instruction-based resolution
+    instructions.resolveAllBranches();
+}
+
 void CodeGenerator::saveCallerSavedRegisters() {
     // Implementation placeholder
 }

@@ -79,6 +79,7 @@ private:
 
     // Code generation helpers
     void resolveLabels();
+    void finalizeInstructionAddressing(size_t baseAddress = 0);
     void saveCallerSavedRegisters();
     void restoreCallerSavedRegisters();
 

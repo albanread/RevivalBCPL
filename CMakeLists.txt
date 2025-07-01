@@ -48,6 +48,12 @@ add_executable(test_jit_memory_advanced
         JITMemoryManager.cpp
 )
 
+# Add test executable for instruction encoding
+add_executable(test_instruction_encoding
+        test_instruction_encoding.cpp
+        AArch64Instructions.cpp
+)
+
 if(APPLE)
     set_target_properties(compiler PROPERTIES
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "-"

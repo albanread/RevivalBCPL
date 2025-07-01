@@ -26,6 +26,10 @@ This compiler is an active work in progress. It successfully parses BCPL source 
 
 * **Target Architecture:** AArch64 (Apple Silicon).
 * **Compiler Pipeline:** Features a full multi-stage pipeline including a preprocessor, parser, Abstract Syntax Tree (AST) generator, and native code generator.
+* **Optimization Passes:** Modular pass-based optimization system with:
+    * **Constant Folding Pass:** Evaluates constant expressions at compile time and applies algebraic simplifications (e.g., `x * 1` → `x`, `2 + 3` → `5`)
+    * **Loop Invariant Code Motion Pass:** Moves loop-invariant expressions outside of loops to reduce redundant computation
+    * **Extensible Architecture:** Easy to add new optimization passes (see `OPTIMIZATION_PASSES.md`)
 * **Register Management:** Implements a robust register management system with:
     * A `RegisterManager` for tracking variables that live in callee-saved registers.
     * A `ScratchAllocator` for temporary, caller-saved registers used during expression evaluation.

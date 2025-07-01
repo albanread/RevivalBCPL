@@ -1,5 +1,5 @@
 #include "LoopOptimizer.h"
-#include "optimizer.h"
+#include "Optimizer.h"
 #include <set>
 #include <vector>
 

@@ -19,10 +19,13 @@ add_executable(compiler
         Lexer.cpp
         Parser.cpp
         CodeGenerator.cpp
+        StatementCodeGenerator.cpp
+        ExpressionCodeGenerator.cpp
         AArch64Instructions.cpp
         JitRuntime.cpp
         DebugPrinter.cpp
         Optimizer.cpp
+        LoopOptimizer.cpp
         LabelManager.cpp
         ScratchAllocator.cpp
         RegisterManager.cpp

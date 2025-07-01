@@ -1,0 +1,3 @@
+/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir
+/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/edit_cache.dir
+/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/rebuild_cache.dir

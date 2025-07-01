@@ -3412,6 +3412,7 @@ compiler: /lib/x86_64-linux-gnu/libc.so.6 \
   CMakeFiles/compiler.dir/AArch64Instructions.cpp.o \
   CMakeFiles/compiler.dir/CodeGenerator.cpp.o \
   CMakeFiles/compiler.dir/DebugPrinter.cpp.o \
+  CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o \
   CMakeFiles/compiler.dir/JitRuntime.cpp.o \
   CMakeFiles/compiler.dir/LabelManager.cpp.o \
   CMakeFiles/compiler.dir/Lexer.cpp.o \
@@ -3421,6 +3422,7 @@ compiler: /lib/x86_64-linux-gnu/libc.so.6 \
   CMakeFiles/compiler.dir/Preprocessor.cpp.o \
   CMakeFiles/compiler.dir/RegisterManager.cpp.o \
   CMakeFiles/compiler.dir/ScratchAllocator.cpp.o \
+  CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o \
   CMakeFiles/compiler.dir/main.cpp.o
 
 
@@ -3469,6 +3471,8 @@ RegisterManager.cpp:
 /usr/include/x86_64-linux-gnu/c++/13/bits/basic_file.h:
 
 /usr/include/c++/13/fstream:
+
+CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o:
 
 /usr/include/c++/13/filesystem:
 
@@ -3771,6 +3775,8 @@ Preprocessor.cpp:
 /usr/include/c++/13/bits/functexcept.h:
 
 /usr/include/c++/13/ext/alloc_traits.h:
+
+CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o:
 
 /usr/include/c++/13/bit:
 

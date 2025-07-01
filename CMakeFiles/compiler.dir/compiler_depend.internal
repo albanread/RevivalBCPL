@@ -3428,6 +3428,7 @@ compiler
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/AArch64Instructions.cpp.o
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/CodeGenerator.cpp.o
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/DebugPrinter.cpp.o
+ /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/JitRuntime.cpp.o
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/LabelManager.cpp.o
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/Lexer.cpp.o
@@ -3437,5 +3438,6 @@ compiler
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/Preprocessor.cpp.o
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/RegisterManager.cpp.o
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/ScratchAllocator.cpp.o
+ /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o
  /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir/main.cpp.o
 

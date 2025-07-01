@@ -54,7 +54,34 @@ void ExpressionCodeGenerator::visitVariableAccess(const VariableAccess* node) {
 
 // Placeholder implementations for other expression visitor methods
 void ExpressionCodeGenerator::visitUnaryOp(const UnaryOp* node) {
-    throw std::runtime_error("ExpressionCodeGenerator::visitUnaryOp not implemented yet");
+    codeGen.visitExpression(node->rhs.get());
+
+    switch (node->op) {
+        case TokenType::OpLogNot:
+            codeGen.instructions.eor(codeGen.X0, codeGen.X0, 1, "Logical NOT");
+            break;
+        case TokenType::OpMinus:
+            codeGen.instructions.neg(codeGen.X0, codeGen.X0, "Arithmetic negation");
+            break;
+        case TokenType::OpAt:  // @ operator (address-of)
+            // For variables, calculate address instead of loading value
+            if (auto var = dynamic_cast<const VariableAccess*>(node->rhs.get())) {
+                if (auto it = codeGen.globals.find(var->name); it != codeGen.globals.end()) {
+                    codeGen.instructions.add(codeGen.X0, codeGen.X28, it->second * 8, AArch64Instructions::LSL, 0, "Address of global " + var->name);
+                } else {
+                    int offset = codeGen.getLocalOffset(var->name);
+                    codeGen.instructions.add(codeGen.X0, codeGen.X29, offset, AArch64Instructions::LSL, 0, "Address of local " + var->name);
+                }
+            } else {
+                throw std::runtime_error("@ operator requires addressable operand");
+            }
+            break;
+        case TokenType::OpBang:  // ! operator (indirection)
+            codeGen.instructions.ldr(codeGen.X0, codeGen.X0, 0, "Indirection");
+            break;
+        default:
+            throw std::runtime_error("Unknown unary operator");
+    }
 }
 
 void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {

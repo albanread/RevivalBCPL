@@ -9,7 +9,7 @@
 #include <cassert>
 #include <algorithm> // For std::min
 
-CodeGenerator::CodeGenerator() : instructions(), labelManager(), scratchAllocator(), registerManager(instructions), currentLocalVarOffset(0), maxOutgoingParamSpace(0), maxCallerSavedRegsSpace(0) {
+CodeGenerator::CodeGenerator() : instructions(), labelManager(), scratchAllocator(), registerManager(instructions), currentLocalVarOffset(0), maxOutgoingParamSpace(0), maxCallerSavedRegsSpace(0), manifestConstants() {
     // Initialize callee-saved registers (x19-x28)
     for (uint32_t i = 19; i <= 28; ++i) {
         calleeSavedRegs.push_back(i);
@@ -72,7 +72,7 @@ void CodeGenerator::visitProgram(const Program* node) {
 
 void CodeGenerator::visitManifestDeclaration(const ManifestDeclaration* node) {
     for (const auto& manifest : node->manifests) {
-        manifests[manifest.name] = manifest.value;
+        manifestConstants[manifest.name] = manifest.value;
     }
 }
 
@@ -85,6 +85,7 @@ void CodeGenerator::visitGlobalDeclaration(const GlobalDeclaration* node) {
 #include <iostream>
 
 void CodeGenerator::visitFunctionDeclaration(const FunctionDeclaration* node) {
+    registerManager.clear(); // Clear register state for new function
     std::cout << "Visiting function declaration: " << node->name << std::endl;
     currentFunctionName = node->name; // Set current function name
     labelManager.pushScope(LabelManager::ScopeType::FUNCTION);
@@ -122,10 +123,7 @@ void CodeGenerator::visitFunctionDeclaration(const FunctionDeclaration* node) {
         // For now, parameters are always loaded into X0, X1, X2...
         // The RegisterManager will handle keeping them in registers if needed later.
         // We still need to store them to their stack home for consistency and potential spills.
-        instructions.str(X0 + i, X29, offset, "Store parameter " + node->params[i] + " to stack home");
-        // Also, inform RegisterManager that this variable is now in a register (X0+i)
-        // and its home is at 'offset'. Mark it dirty as it's been "initialized" in the register.
-        registerManager.acquireRegister(node->params[i], offset);
+        registerManager.assignParameterRegister(node->params[i], X0 + i, offset);
         registerManager.markDirty(node->params[i]);
     }
 
@@ -261,7 +259,7 @@ void CodeGenerator::visitStringLiteral(const StringLiteral* node) {
 
 void CodeGenerator::visitVariableAccess(const VariableAccess* node) {
     // First, check for manifest constants (this part is unchanged).
-    if (auto it = manifests.find(node->name); it != manifests.end()) {
+    if (auto it = manifestConstants.find(node->name); it != manifestConstants.end()) {
         instructions.loadImmediate(X0, it->second, "Load manifest constant " + node->name);
         return;
     }
@@ -394,6 +392,12 @@ void CodeGenerator::visitBinaryOp(const BinaryOp* node) {
             instructions.cmp(X0, rightReg);
             instructions.cset(X0, AArch64Instructions::GE);
             instructions.neg(X0, X0);
+            break;
+        case TokenType::OpLshift:
+            instructions.lsl(X0, X0, 1, "Left shift by 1 (strength reduction)");
+            break;
+        case TokenType::OpRshift:
+            instructions.lsr(X0, X0, rightReg, "Right shift");
             break;
         // Add other operators (AND, OR, etc.)
         default:
@@ -626,12 +630,10 @@ void CodeGenerator::visitSwitchonStatement(const SwitchonStatement* node) {
 
     // The value is in X0. We pass it directly to the search functions.
     // This removes the store/load inefficiency and the garbage ldr.
-    if (node->cases.size() > 3 && isSmallDenseRange(node->cases)) {
-        generateJumpTable(node->cases, 0, defaultLabel);
+    if (node->cases.size() > 0 && isSmallDenseRange(node->cases)) {
+        generateJumpTable(node->cases, defaultLabel);
     } else {
-        // The '0' here is a placeholder since the binary search doesn't
-        // need the stack offset anymore.
-        generateBinarySearchTree(node->cases, 0, defaultLabel);
+        generateBinarySearchTree(node->cases, defaultLabel);
     }
 
     // Generate case bodies using the correct labels from the AST.
@@ -674,11 +676,9 @@ void CodeGenerator::visitSwitchonStatement(const SwitchonStatement* node) {
 
 void CodeGenerator::generateJumpTable(
     const std::vector<SwitchonStatement::SwitchCase>& cases,
-    int switchValueOffset,
     const std::string& defaultLabel) {
 
-    // Load switch value
-    instructions.ldr(X0, X29, switchValueOffset);
+    // Switch value is already in X0 from visitSwitchonStatement.
 
     // Check bounds
     int minValue = cases.front().value;
@@ -714,11 +714,9 @@ void CodeGenerator::generateJumpTable(
 
 void CodeGenerator::generateBinarySearchTree(
     const std::vector<SwitchonStatement::SwitchCase>& cases,
-    int switchValueOffset,
     const std::string& defaultLabel) {
 
-    // Load switch value
-    instructions.ldr(X0, X29, switchValueOffset);
+    // Switch value is already in X0 from visitSwitchonStatement.
 
     // Generate binary search using recursive helper
     generateBinarySearchNode(cases, 0, cases.size() - 1, defaultLabel);
@@ -791,16 +789,15 @@ void CodeGenerator::visitFunctionCall(const FunctionCall* node) {
     }
 
     // Evaluate arguments and place them in registers or on the stack.
-    for (size_t i = 0; i < node->arguments.size(); ++i) {
+    // Evaluate in reverse order to avoid overwriting argument registers.
+    for (int i = node->arguments.size() - 1; i >= 0; --i) {
         visitExpression(node->arguments[i].get()); // Result is in X0
 
         if (i < 8) { // First 8 arguments go into registers X0-X7
-            if (i != 0) { // X0 already holds the result, no need to move if it's the first arg
-                instructions.mov(X0 + i, X0, "Move arg " + std::to_string(i) + " to X" + std::to_string(i));
-            }
+            instructions.mov(X0 + i, X0, "Move arg " + std::to_string(i) + " to X" + std::to_string(i));
         } else { // Arguments beyond the 8th go onto the stack
-            // Stack arguments are pushed in reverse order, so calculate offset from the end of the allocated block.
-            size_t stack_offset_index = node->arguments.size() - 1 - i;
+            // Stack arguments are pushed in order, so calculate offset from the beginning of the allocated block.
+            size_t stack_offset_index = i - 8;
             instructions.str(X0, SP, stack_offset_index * 8, "Store arg " + std::to_string(i) + " to stack");
         }
     }
@@ -830,8 +827,10 @@ void CodeGenerator::visitFunctionCall(const FunctionCall* node) {
 void CodeGenerator::visitAssignment(const Assignment* node) {
     visitExpression(node->rhs[0].get());
 
-    if (auto var = dynamic_cast<const VariableAccess*>(node->lhs[0].get())) {
-        if (auto it = manifests.find(var->name); it != manifests.end()) {
+    if (auto num_lit = dynamic_cast<const NumberLiteral*>(node->lhs[0].get())) {
+        throw std::runtime_error("Cannot assign to a number literal.");
+    } else if (auto var = dynamic_cast<const VariableAccess*>(node->lhs[0].get())) {
+        if (auto it = manifestConstants.find(var->name); it != manifestConstants.end()) {
             throw std::runtime_error("Cannot assign to manifest constant: " + var->name);
         } else if (auto it = globals.find(var->name); it != globals.end()) {
             instructions.str(X0, X28, it->second * 8, "Store to global " + var->name);
@@ -862,6 +861,20 @@ void CodeGenerator::visitAssignment(const Assignment* node) {
         instructions.add(vectorBaseReg, vectorBaseReg, indexReg, AArch64Instructions::LSL, 3, "Calculate element address");
         instructions.str(valueReg, vectorBaseReg, 0, "Store to vector element");
         scratchAllocator.release(vectorBaseReg);
+        scratchAllocator.release(indexReg);
+        scratchAllocator.release(valueReg);
+    } else if (auto charAccess = dynamic_cast<const CharacterAccess*>(node->lhs[0].get())) {
+        uint32_t valueReg = scratchAllocator.acquire();
+        instructions.mov(valueReg, X0, "Save RHS value for character assignment");
+        visitExpression(charAccess->index.get());
+        uint32_t indexReg = scratchAllocator.acquire();
+        instructions.mov(indexReg, X0, "Save index value");
+        visitExpression(charAccess->string.get());
+        uint32_t stringBaseReg = scratchAllocator.acquire();
+        instructions.mov(stringBaseReg, X0, "Save string base address");
+        instructions.add(stringBaseReg, stringBaseReg, indexReg, AArch64Instructions::LSL, 2, "Calculate character address (4-byte chars)");
+        instructions.str(valueReg, stringBaseReg, 0, "Store to character");
+        scratchAllocator.release(stringBaseReg);
         scratchAllocator.release(indexReg);
         scratchAllocator.release(valueReg);
     } else {
@@ -912,6 +925,7 @@ void CodeGenerator::visitResultisStatement(const ResultisStatement* node) {
 
     // No explicit branch needed here, as the return label is defined right before the epilogue.
     // The epilogue will be executed directly after the RESULTIS statement's code.
+    instructions.b(labelManager.getCurrentReturnLabel(), "Branch to function epilogue after RESULTIS");
 }
 
 void CodeGenerator::visitBreakStatement(const BreakStatement* node) {

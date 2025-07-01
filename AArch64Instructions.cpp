@@ -96,7 +96,14 @@ void AArch64Instructions::sdiv(uint32_t rd, uint32_t rn, uint32_t rm, const std:
 }
 
 void AArch64Instructions::lsl(uint32_t rd, uint32_t rn, uint32_t imm, const std::string& comment) {
-    addInstruction({0xD3400000 | (imm << 10) | (rn << 5) | rd, "lsl " + regName(rd) + ", " + regName(rn) + ", #" + std::to_string(imm), comment});
+    // This is a simplified version that uses UBFM for LSL
+    uint32_t encoding = 0x53000000 | (1 << 22) | (rd & 0x1F) | ((rn & 0x1F) << 5) | ((imm & 0x3F) << 16) | ((63 - imm) << 10);
+    addInstruction({encoding, "lsl " + regName(rd) + ", " + regName(rn) + ", #" + std::to_string(imm), comment});
+}
+
+void AArch64Instructions::lsr(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
+    uint32_t encoding = 0x1AC02800 | (rd & 0x1F) | ((rn & 0x1F) << 5) | ((rm & 0x1F) << 16);
+    addInstruction({encoding, "lsr " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment});
 }
 
 void AArch64Instructions::msub(uint32_t rd, uint32_t rn, uint32_t rm, uint32_t ra, const std::string& comment) {

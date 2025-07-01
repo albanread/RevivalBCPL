@@ -42,7 +42,7 @@ private:
 
     std::unordered_map<std::string, int> localVars;
     std::unordered_map<std::string, size_t> globals;
-    std::unordered_map<std::string, int> manifests;
+    std::unordered_map<std::string, int> manifestConstants;
     std::unordered_map<std::string, size_t> functions;
 
     struct PendingCase {
@@ -119,8 +119,8 @@ private:
                                 const std::vector<std::string>& operands,
                                 const std::string& comment = "");
     bool isSmallDenseRange(const std::vector<SwitchonStatement::SwitchCase>& cases);
-    void generateJumpTable(const std::vector<SwitchonStatement::SwitchCase>& cases, int switchValueOffset, const std::string& defaultLabel);
-    void generateBinarySearchTree(const std::vector<SwitchonStatement::SwitchCase>& cases, int switchValueOffset, const std::string& defaultLabel);
+    void generateJumpTable(const std::vector<SwitchonStatement::SwitchCase>& cases, const std::string& defaultLabel);
+    void generateBinarySearchTree(const std::vector<SwitchonStatement::SwitchCase>& cases, const std::string& defaultLabel);
     void generateBinarySearchNode(const std::vector<SwitchonStatement::SwitchCase>& cases, size_t start, size_t end, const std::string& defaultLabel);
     bool isRegisterInUse(uint32_t reg);
     void saveCalleeSavedRegisters();

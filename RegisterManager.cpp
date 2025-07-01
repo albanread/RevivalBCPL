@@ -18,6 +18,42 @@ RegisterManager::RegisterManager(AArch64Instructions& instructions) : instructio
     }
 }
 
+void RegisterManager::assignParameterRegister(const std::string& varName, uint32_t reg, int stackOffset) {
+    // Ensure the register is not already in use by another variable
+    if (reg_to_var_.count(reg) && reg_to_var_[reg] != varName) {
+        // This indicates a logic error in the compiler if a parameter register is already assigned
+        // to another variable. For now, we'll throw an error.
+        throw std::runtime_error("Register " + instructions_.regName(reg) + " already assigned to " + reg_to_var_[reg] + " when assigning parameter " + varName);
+    }
+
+    // If the variable was already in a register, remove its old mapping
+    if (var_to_reg_.count(varName)) {
+        uint32_t oldReg = var_to_reg_[varName];
+        var_to_reg_.erase(varName);
+        reg_to_var_.erase(oldReg);
+        used_regs_.erase(oldReg);
+        // Add the old register back to available if it's not the new register
+        if (oldReg != reg) {
+            available_regs_.push_back(oldReg);
+        }
+    }
+
+    var_to_reg_[varName] = reg;
+    reg_to_var_[reg] = varName;
+    var_to_stack_offset_[varName] = stackOffset;
+    used_regs_.insert(reg);
+
+    // Remove from available_regs_ if it was there
+    auto it_avail = std::find(available_regs_.begin(), available_regs_.end(), reg);
+    if (it_avail != available_regs_.end()) {
+        available_regs_.erase(it_avail);
+    }
+
+    touchRegister(reg); // Mark as most recently used
+    // Parameters are not initially dirty, as their value is assumed to be correct from the caller.
+    // They become dirty only if modified within the function.
+}
+
 uint32_t RegisterManager::acquireRegister(const std::string& varName, int stackOffset) {
     uint32_t reg = findAndAssignRegister(varName, stackOffset);
     instructions_.ldr(reg, AArch64Instructions::X29, stackOffset, "Load variable " + varName + " into " + instructions_.regName(reg));

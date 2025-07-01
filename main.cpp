@@ -10,12 +10,14 @@
 #include "AST.h"
 #include "DebugPrinter.h"
 #include "Preprocessor.h"
+#include "Optimizer.h"
 
 void printUsage(const char* programName) {
     std::cerr << "Usage: " << programName << " [options] <source_file.b>\n"
               << "Options:\n"
               << "  --debug     Print debug information (tokens and AST)\n"
               << "  --asm       Output generated assembly\n"
+              << "  --opt       Enable optimization\n"
               << "  --help      Display this help message\n";
 }
 
@@ -67,11 +69,21 @@ int main(int argc, char* argv[]) {
         ProgramPtr ast = Parser::getInstance().parse(source_code);
         std::cout << "Parsing complete.\n\n";
 
+        ProgramPtr optimized_ast = nullptr;
+        if (flags.count("--opt")) {
+            // Optimize the AST
+            std::cout << "Optimizing...\n";
+            optimized_ast = Optimizer::getInstance().optimize(std::move(ast));
+            std::cout << "Optimization complete.\n\n";
+        } else {
+            optimized_ast = std::move(ast);
+        }
+
         // Print debug information if requested
         if (flags.count("--debug")) {
             std::cout << "=== Debug Information ===\n";
             DebugPrinter::getInstance().printTokens(source_code);
-            DebugPrinter::getInstance().printAST(ast);
+            DebugPrinter::getInstance().printAST(optimized_ast);
 
             std::cout << "\n";
         }
@@ -86,7 +98,7 @@ int main(int argc, char* argv[]) {
         JitRuntime::getInstance().registerSymbol("finish", (uintptr_t)bcpl_finish);
         
         CodeGenerator codegen;
-        codegen.compile(std::move(ast));
+        codegen.compile(std::move(optimized_ast));
         std::cout << "Code generation complete.\n\n";
 
         // Print assembly if requested

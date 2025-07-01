@@ -3,45 +3,29 @@
 
 #include "AST.h"
 #include <memory>
+#include <set>
+#include <unordered_map>
 
-/**
- * @class Optimizer
- * @brief A singleton class that performs optimizations on the Abstract Syntax Tree.
- *
- * This class implements an AST-to-AST transformation pass. It walks the input AST
- * and returns a new, functionally equivalent, but more efficient AST. This initial
- * implementation focuses on Constant Folding.
- */
 class Optimizer {
 public:
-    // --- Singleton Access ---
+    std::unordered_map<std::string, int64_t> manifests;
+
     static Optimizer& getInstance() {
         static Optimizer instance;
         return instance;
     }
 
-    // --- Deleted Constructors ---
     Optimizer(const Optimizer&) = delete;
     Optimizer& operator=(const Optimizer&) = delete;
 
-    /**
-     * @brief The main entry point for the optimization pass.
-     * @param ast A unique_ptr to the root of the AST to be optimized.
-     * @return A unique_ptr to the root of the newly created, optimized AST.
-     */
     ProgramPtr optimize(ProgramPtr ast);
 
-private:
-    Optimizer() = default;
-
-    // --- Visitor methods that return new, optimized nodes ---
-    // Each method takes a node from the old tree and returns a
-    // unique_ptr to a node for the new tree.
-
-    // Generic dispatchers
     ExprPtr visit(Expression* node);
     StmtPtr visit(Statement* node);
     DeclPtr visit(Declaration* node);
+
+private:
+    Optimizer() = default;
 
     // Expression visitors
     ExprPtr visit(NumberLiteral* node);
@@ -54,6 +38,8 @@ private:
     ExprPtr visit(FunctionCall* node);
     ExprPtr visit(ConditionalExpression* node);
     ExprPtr visit(Valof* node);
+    ExprPtr visit(VectorConstructor* node);
+    ExprPtr visit(VectorAccess* node);
     
     // Statement visitors
     StmtPtr visit(Assignment* node);
@@ -68,6 +54,9 @@ private:
     StmtPtr visit(ReturnStatement* node);
     StmtPtr visit(FinishStatement* node);
     StmtPtr visit(ResultisStatement* node);
+    StmtPtr visit(RepeatStatement* node);
+    StmtPtr visit(SwitchonStatement* node);
+    StmtPtr visit(EndcaseStatement* node);
     
     // Declaration visitors
     DeclPtr visit(LetDeclaration* node);
@@ -78,4 +67,3 @@ private:
 };
 
 #endif // OPTIMIZER_H
-

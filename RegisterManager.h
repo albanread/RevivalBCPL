@@ -50,6 +50,9 @@ public:
     // Acquires a register for a variable without loading its value from stack.
     uint32_t acquireRegisterForInit(const std::string& varName, int stackOffset);
 
+    // Assigns a specific register to a parameter, assuming it's already in that register.
+    void assignParameterRegister(const std::string& varName, uint32_t reg, int stackOffset);
+
     // Clears all register allocations (e.g., at function exit).
     void clear();
 

@@ -1,3 +1,5 @@
 /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/compiler.dir
+/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/test_jit_memory_manager.dir
+/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/test_jit_memory_advanced.dir
 /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/edit_cache.dir
 /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles/rebuild_cache.dir

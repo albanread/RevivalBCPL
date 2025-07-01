@@ -64,10 +64,14 @@ CMAKE_BINARY_DIR = /home/runner/work/RevivalBCPL/RevivalBCPL
 
 # The main recursive "all" target.
 all: CMakeFiles/compiler.dir/all
+all: CMakeFiles/test_jit_memory_manager.dir/all
+all: CMakeFiles/test_jit_memory_advanced.dir/all
 .PHONY : all
 
 # The main recursive "codegen" target.
 codegen: CMakeFiles/compiler.dir/codegen
+codegen: CMakeFiles/test_jit_memory_manager.dir/codegen
+codegen: CMakeFiles/test_jit_memory_advanced.dir/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
@@ -76,6 +80,8 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles/compiler.dir/clean
+clean: CMakeFiles/test_jit_memory_manager.dir/clean
+clean: CMakeFiles/test_jit_memory_advanced.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -85,12 +91,12 @@ clean: CMakeFiles/compiler.dir/clean
 CMakeFiles/compiler.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 "Built target compiler"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 "Built target compiler"
 .PHONY : CMakeFiles/compiler.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/compiler.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles 19
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles 20
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/compiler.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles 0
 .PHONY : CMakeFiles/compiler.dir/rule
@@ -102,13 +108,77 @@ compiler: CMakeFiles/compiler.dir/rule
 # codegen rule for target.
 CMakeFiles/compiler.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 "Finished codegen for target compiler"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 "Finished codegen for target compiler"
 .PHONY : CMakeFiles/compiler.dir/codegen
 
 # clean rule for target.
 CMakeFiles/compiler.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/clean
 .PHONY : CMakeFiles/compiler.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_jit_memory_manager.dir
+
+# All Build rule for target.
+CMakeFiles/test_jit_memory_manager.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=24,25,26 "Built target test_jit_memory_manager"
+.PHONY : CMakeFiles/test_jit_memory_manager.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_jit_memory_manager.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_jit_memory_manager.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles 0
+.PHONY : CMakeFiles/test_jit_memory_manager.dir/rule
+
+# Convenience name for target.
+test_jit_memory_manager: CMakeFiles/test_jit_memory_manager.dir/rule
+.PHONY : test_jit_memory_manager
+
+# codegen rule for target.
+CMakeFiles/test_jit_memory_manager.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=24,25,26 "Finished codegen for target test_jit_memory_manager"
+.PHONY : CMakeFiles/test_jit_memory_manager.dir/codegen
+
+# clean rule for target.
+CMakeFiles/test_jit_memory_manager.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/clean
+.PHONY : CMakeFiles/test_jit_memory_manager.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_jit_memory_advanced.dir
+
+# All Build rule for target.
+CMakeFiles/test_jit_memory_advanced.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=21,22,23 "Built target test_jit_memory_advanced"
+.PHONY : CMakeFiles/test_jit_memory_advanced.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_jit_memory_advanced.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_jit_memory_advanced.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles 0
+.PHONY : CMakeFiles/test_jit_memory_advanced.dir/rule
+
+# Convenience name for target.
+test_jit_memory_advanced: CMakeFiles/test_jit_memory_advanced.dir/rule
+.PHONY : test_jit_memory_advanced
+
+# codegen rule for target.
+CMakeFiles/test_jit_memory_advanced.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=21,22,23 "Finished codegen for target test_jit_memory_advanced"
+.PHONY : CMakeFiles/test_jit_memory_advanced.dir/codegen
+
+# clean rule for target.
+CMakeFiles/test_jit_memory_advanced.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/clean
+.PHONY : CMakeFiles/test_jit_memory_advanced.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

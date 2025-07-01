@@ -10,6 +10,7 @@ compiler: \
   CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o \
   CMakeFiles/compiler.dir/AArch64Instructions.cpp.o \
   CMakeFiles/compiler.dir/JitRuntime.cpp.o \
+  CMakeFiles/compiler.dir/JITMemoryManager.cpp.o \
   CMakeFiles/compiler.dir/DebugPrinter.cpp.o \
   CMakeFiles/compiler.dir/Optimizer.cpp.o \
   CMakeFiles/compiler.dir/LoopOptimizer.cpp.o \
@@ -70,6 +71,8 @@ CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o:
 CMakeFiles/compiler.dir/AArch64Instructions.cpp.o:
 
 CMakeFiles/compiler.dir/JitRuntime.cpp.o:
+
+CMakeFiles/compiler.dir/JITMemoryManager.cpp.o:
 
 CMakeFiles/compiler.dir/DebugPrinter.cpp.o:
 

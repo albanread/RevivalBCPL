@@ -13,6 +13,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/runner/work/RevivalBCPL/RevivalBCPL/ConstantFoldingPass.cpp" "CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o" "gcc" "CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o.d"
   "/home/runner/work/RevivalBCPL/RevivalBCPL/DebugPrinter.cpp" "CMakeFiles/compiler.dir/DebugPrinter.cpp.o" "gcc" "CMakeFiles/compiler.dir/DebugPrinter.cpp.o.d"
   "/home/runner/work/RevivalBCPL/RevivalBCPL/ExpressionCodeGenerator.cpp" "CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o" "gcc" "CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o.d"
+  "/home/runner/work/RevivalBCPL/RevivalBCPL/JITMemoryManager.cpp" "CMakeFiles/compiler.dir/JITMemoryManager.cpp.o" "gcc" "CMakeFiles/compiler.dir/JITMemoryManager.cpp.o.d"
   "/home/runner/work/RevivalBCPL/RevivalBCPL/JitRuntime.cpp" "CMakeFiles/compiler.dir/JitRuntime.cpp.o" "gcc" "CMakeFiles/compiler.dir/JitRuntime.cpp.o.d"
   "/home/runner/work/RevivalBCPL/RevivalBCPL/LabelManager.cpp" "CMakeFiles/compiler.dir/LabelManager.cpp.o" "gcc" "CMakeFiles/compiler.dir/LabelManager.cpp.o.d"
   "/home/runner/work/RevivalBCPL/RevivalBCPL/Lexer.cpp" "CMakeFiles/compiler.dir/Lexer.cpp.o" "gcc" "CMakeFiles/compiler.dir/Lexer.cpp.o.d"

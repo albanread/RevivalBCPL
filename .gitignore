@@ -7,6 +7,10 @@ cmake_install.cmake
 *.o.d
 compiler
 
+# Test executables
+test_jit_memory_manager
+test_jit_memory_advanced
+
 # IDE files
 .vscode/
 .idea/
@@ -14,3 +18,6 @@ compiler
 # Temporary files
 *.tmp
 *.temp
+
+# Test files
+simple_test.b

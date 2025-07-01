@@ -1,0 +1,1 @@
+LET START() = VALOF $( WRITES("Hello from BCPL!"); NEWLINE(); RESULTIS 0 $)

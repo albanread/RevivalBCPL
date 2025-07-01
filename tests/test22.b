@@ -19,7 +19,7 @@ $(
   WRITEF("New value of V!5 is %i*N", V!5)
 
   // Recalculate sum
-  sum = 0
+  sum := 0
   FOR i = 0 TO 9 DO
     sum := sum + V!i
 

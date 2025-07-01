@@ -13,8 +13,8 @@ $(
   $)
   // Expected y = 1 + 2 + 4 + 5 + 6 = 18
 
-  LET z := 0
-  LET j := 0
+  LET z = 0
+  LET j = 0
 
   // Test LOOP and BREAK in a REPEAT UNTIL loop
   REPEAT

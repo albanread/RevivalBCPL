@@ -7,8 +7,8 @@ $(
 
   NEWLINE()
 
-  WRITES("This is the end of the test.*N");
-  FINISH();
+  WRITES("This is the end of the test.*N")
+  FINISH;
 
   // This part should not be reached
   WRITES("This should not be printed.*N")

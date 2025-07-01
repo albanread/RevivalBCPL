@@ -1,0 +1,15 @@
+LET START() BE $(
+    LET A = 10
+    LET B = 5
+    LET C = 0
+
+    FOR I = 0 TO 9 DO $(
+        C := C + (A * B) // A * B is loop-invariant
+    $)
+
+    WRITES("Result of LICM test: ")
+    WRITEN(C)
+    NEWLINE()
+
+    FINISH
+$)

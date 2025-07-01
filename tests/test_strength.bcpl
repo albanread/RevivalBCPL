@@ -1,0 +1,28 @@
+LET START() BE $(
+    LET X = 10
+    LET Y = 20
+    LET Z = 30
+    LET W = 40
+
+    WRITES("Initial values: X=10, Y=20, Z=30, W=40*N")
+
+    // Test strength reduction
+    WRITES("X * 2 = ")
+    WRITEN(X * 2) // Should be optimized to X << 1
+    NEWLINE()
+
+    WRITES("Y / 2 = ")
+    WRITEN(Y / 2) // Should be optimized to Y >> 1
+    NEWLINE()
+
+    // Test algebraic identity simplification
+    WRITES("Z + 0 = ")
+    WRITEN(Z + 0) // Should be optimized to Z
+    NEWLINE()
+
+    WRITES("W * 1 = ")
+    WRITEN(W * 1) // Should be optimized to W
+    NEWLINE()
+
+    FINISH
+$)

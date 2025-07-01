@@ -42,6 +42,12 @@ add_executable(test_jit_memory_manager
         JITMemoryManager.cpp
 )
 
+# Add advanced test executable for JITMemoryManager
+add_executable(test_jit_memory_advanced
+        test_jit_memory_advanced.cpp
+        JITMemoryManager.cpp
+)
+
 if(APPLE)
     set_target_properties(compiler PROPERTIES
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "-"

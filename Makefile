@@ -142,6 +142,19 @@ test_jit_memory_manager/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/build
 .PHONY : test_jit_memory_manager/fast
 
+#=============================================================================
+# Target rules for targets named test_jit_memory_advanced
+
+# Build rule for target.
+test_jit_memory_advanced: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_jit_memory_advanced
+.PHONY : test_jit_memory_advanced
+
+# fast build rule for target.
+test_jit_memory_advanced/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/build
+.PHONY : test_jit_memory_advanced/fast
+
 AArch64Instructions.o: AArch64Instructions.cpp.o
 .PHONY : AArch64Instructions.o
 
@@ -269,6 +282,7 @@ JITMemoryManager.o: JITMemoryManager.cpp.o
 JITMemoryManager.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/JITMemoryManager.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/JITMemoryManager.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/JITMemoryManager.cpp.o
 .PHONY : JITMemoryManager.cpp.o
 
 JITMemoryManager.i: JITMemoryManager.cpp.i
@@ -278,6 +292,7 @@ JITMemoryManager.i: JITMemoryManager.cpp.i
 JITMemoryManager.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/JITMemoryManager.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/JITMemoryManager.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/JITMemoryManager.cpp.i
 .PHONY : JITMemoryManager.cpp.i
 
 JITMemoryManager.s: JITMemoryManager.cpp.s
@@ -287,6 +302,7 @@ JITMemoryManager.s: JITMemoryManager.cpp.s
 JITMemoryManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/JITMemoryManager.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/JITMemoryManager.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/JITMemoryManager.cpp.s
 .PHONY : JITMemoryManager.cpp.s
 
 JitRuntime.o: JitRuntime.cpp.o
@@ -601,6 +617,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+test_jit_memory_advanced.o: test_jit_memory_advanced.cpp.o
+.PHONY : test_jit_memory_advanced.o
+
+# target to build an object file
+test_jit_memory_advanced.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/test_jit_memory_advanced.cpp.o
+.PHONY : test_jit_memory_advanced.cpp.o
+
+test_jit_memory_advanced.i: test_jit_memory_advanced.cpp.i
+.PHONY : test_jit_memory_advanced.i
+
+# target to preprocess a source file
+test_jit_memory_advanced.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/test_jit_memory_advanced.cpp.i
+.PHONY : test_jit_memory_advanced.cpp.i
+
+test_jit_memory_advanced.s: test_jit_memory_advanced.cpp.s
+.PHONY : test_jit_memory_advanced.s
+
+# target to generate assembly for a file
+test_jit_memory_advanced.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_advanced.dir/build.make CMakeFiles/test_jit_memory_advanced.dir/test_jit_memory_advanced.cpp.s
+.PHONY : test_jit_memory_advanced.cpp.s
+
 test_jit_memory_manager.o: test_jit_memory_manager.cpp.o
 .PHONY : test_jit_memory_manager.o
 
@@ -634,6 +674,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... compiler"
+	@echo "... test_jit_memory_advanced"
 	@echo "... test_jit_memory_manager"
 	@echo "... AArch64Instructions.o"
 	@echo "... AArch64Instructions.i"
@@ -692,6 +733,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... test_jit_memory_advanced.o"
+	@echo "... test_jit_memory_advanced.i"
+	@echo "... test_jit_memory_advanced.s"
 	@echo "... test_jit_memory_manager.o"
 	@echo "... test_jit_memory_manager.i"
 	@echo "... test_jit_memory_manager.s"

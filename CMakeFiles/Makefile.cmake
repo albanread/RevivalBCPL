@@ -49,4 +49,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/compiler.dir/DependInfo.cmake"
   "CMakeFiles/test_jit_memory_manager.dir/DependInfo.cmake"
+  "CMakeFiles/test_jit_memory_advanced.dir/DependInfo.cmake"
   )

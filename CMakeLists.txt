@@ -23,6 +23,7 @@ add_executable(compiler
         JitRuntime.cpp
         DebugPrinter.cpp
         Optimizer.cpp
+        LoopOptimizer.cpp
         LabelManager.cpp
         ScratchAllocator.cpp
         RegisterManager.cpp

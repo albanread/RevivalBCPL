@@ -85,11 +85,124 @@ void ExpressionCodeGenerator::visitUnaryOp(const UnaryOp* node) {
 }
 
 void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
-    throw std::runtime_error("ExpressionCodeGenerator::visitBinaryOp not implemented yet");
+    // Handle special cases first
+    if (node->op == TokenType::OpBang) {  // Vector subscript (V!E)
+        // Evaluate index first
+        codeGen.visitExpression(node->right.get());
+        // Save index
+        uint32_t indexReg = codeGen.scratchAllocator.acquire();
+        codeGen.instructions.mov(indexReg, codeGen.X0);
+
+        // Evaluate vector address
+        codeGen.visitExpression(node->left.get());
+
+        // Calculate final address and load
+        codeGen.instructions.add(codeGen.X0, codeGen.X0, indexReg, AArch64Instructions::LSL, 3, "Calculate element address (word size)");
+        codeGen.instructions.ldr(codeGen.X0, codeGen.X0, 0, "Load vector element");
+        codeGen.scratchAllocator.release(indexReg);
+        return;
+    }
+
+    // Normal binary operators
+    codeGen.visitExpression(node->right.get());
+    uint32_t rightReg = codeGen.scratchAllocator.acquire();
+    codeGen.instructions.mov(rightReg, codeGen.X0);
+
+    codeGen.visitExpression(node->left.get());
+
+    switch (node->op) {
+        case TokenType::OpPlus:
+            codeGen.instructions.add(codeGen.X0, codeGen.X0, rightReg, AArch64Instructions::LSL, 0, "Add");
+            break;
+        case TokenType::OpMinus:
+            codeGen.instructions.sub(codeGen.X0, codeGen.X0, rightReg, "Subtract");
+            break;
+        case TokenType::OpMultiply:
+            codeGen.instructions.mul(codeGen.X0, codeGen.X0, rightReg, "Multiply");
+            break;
+        case TokenType::OpDivide:
+            // TODO: Add division by zero check
+            codeGen.instructions.sdiv(codeGen.X0, codeGen.X0, rightReg, "Divide");
+            break;
+        case TokenType::OpRemainder:
+            // TODO: Add division by zero check
+            codeGen.instructions.sdiv(codeGen.X2, codeGen.X0, rightReg, "Divide for remainder");
+            codeGen.instructions.msub(codeGen.X0, codeGen.X2, rightReg, codeGen.X0, "Calculate remainder");
+            break;
+        case TokenType::OpEq:
+            codeGen.instructions.cmp(codeGen.X0, rightReg);
+            codeGen.instructions.cset(codeGen.X0, AArch64Instructions::EQ);
+            codeGen.instructions.neg(codeGen.X0, codeGen.X0);
+            break;
+        case TokenType::OpNe:
+            codeGen.instructions.cmp(codeGen.X0, rightReg);
+            codeGen.instructions.cset(codeGen.X0, AArch64Instructions::NE);
+            codeGen.instructions.neg(codeGen.X0, codeGen.X0);
+            break;
+        case TokenType::OpLt:
+            codeGen.instructions.cmp(codeGen.X0, rightReg);
+            codeGen.instructions.cset(codeGen.X0, AArch64Instructions::LT);
+            codeGen.instructions.neg(codeGen.X0, codeGen.X0);
+            break;
+        case TokenType::OpGt:
+            codeGen.instructions.cmp(codeGen.X0, rightReg);
+            codeGen.instructions.cset(codeGen.X0, AArch64Instructions::GT);
+            codeGen.instructions.neg(codeGen.X0, codeGen.X0);
+            break;
+        case TokenType::OpLe:
+            codeGen.instructions.cmp(codeGen.X0, rightReg);
+            codeGen.instructions.cset(codeGen.X0, AArch64Instructions::LE);
+            codeGen.instructions.neg(codeGen.X0, codeGen.X0);
+            break;
+        case TokenType::OpGe:
+            codeGen.instructions.cmp(codeGen.X0, rightReg);
+            codeGen.instructions.cset(codeGen.X0, AArch64Instructions::GE);
+            codeGen.instructions.neg(codeGen.X0, codeGen.X0);
+            break;
+        case TokenType::OpLshift:
+            codeGen.instructions.lsl(codeGen.X0, codeGen.X0, 1, "Left shift by 1 (strength reduction)");
+            break;
+        case TokenType::OpRshift:
+            codeGen.instructions.lsr(codeGen.X0, codeGen.X0, rightReg, "Right shift");
+            break;
+        // Add other operators (AND, OR, etc.)
+        default:
+            throw std::runtime_error("Unknown binary operator");
+    }
+    codeGen.scratchAllocator.release(rightReg);
 }
 
 void ExpressionCodeGenerator::visitFunctionCall(const FunctionCall* node) {
-    throw std::runtime_error("ExpressionCodeGenerator::visitFunctionCall not implemented yet");
+    // Simplified function call implementation
+    // For now, handle basic calls with up to 2 arguments
+    
+    if (node->arguments.size() > 2) {
+        throw std::runtime_error("Function calls with more than 2 arguments not yet supported in refactored code");
+    }
+    
+    // Evaluate arguments and place in X0, X1
+    if (node->arguments.size() >= 1) {
+        codeGen.visitExpression(node->arguments[0].get());
+        if (node->arguments.size() == 2) {
+            // Save first argument in X1
+            codeGen.instructions.mov(codeGen.X1, codeGen.X0, "Move first arg to X1");
+            // Evaluate second argument
+            codeGen.visitExpression(node->arguments[1].get());
+            // Second argument is now in X0, first is in X1
+        }
+    }
+    
+    // Generate call
+    if (auto funcVar = dynamic_cast<const VariableAccess*>(node->function.get())) {
+        // Direct function call
+        if (auto it = codeGen.functions.find(funcVar->name); it != codeGen.functions.end()) {
+            codeGen.instructions.bl(funcVar->name, "Call " + funcVar->name);
+        } else {
+            throw std::runtime_error("Unknown function: " + funcVar->name);
+        }
+    } else {
+        throw std::runtime_error("Indirect function calls not yet supported in refactored code");
+    }
 }
 
 void ExpressionCodeGenerator::visitConditionalExpression(const ConditionalExpression* node) {

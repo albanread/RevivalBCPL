@@ -115,7 +115,28 @@ void StatementCodeGenerator::visitLabeledStatement(const LabeledStatement* node)
 }
 
 void StatementCodeGenerator::visitAssignment(const Assignment* node) {
-    // TODO: Move implementation from CodeGenerator.cpp
+    // Simplified assignment implementation 
+    if (node->rhs.empty() || node->lhs.empty()) {
+        throw std::runtime_error("Assignment must have both LHS and RHS");
+    }
+    
+    // Evaluate RHS expression
+    codeGen.visitExpression(node->rhs[0].get());
+
+    // Handle simple variable assignment
+    if (auto var = dynamic_cast<const VariableAccess*>(node->lhs[0].get())) {
+        if (auto it = codeGen.manifestConstants.find(var->name); it != codeGen.manifestConstants.end()) {
+            throw std::runtime_error("Cannot assign to manifest constant: " + var->name);
+        } else if (auto it = codeGen.globals.find(var->name); it != codeGen.globals.end()) {
+            codeGen.instructions.str(codeGen.X0, codeGen.X28, it->second * 8, "Store to global " + var->name);
+        } else {
+            // Simple local assignment - store to memory
+            int offset = codeGen.getLocalOffset(var->name);
+            codeGen.instructions.str(codeGen.X0, codeGen.X29, offset, "Store to local " + var->name);
+        }
+    } else {
+        throw std::runtime_error("Complex assignment not implemented yet in refactored code");
+    }
 }
 
 void StatementCodeGenerator::visitRoutineCall(const RoutineCall* node) {

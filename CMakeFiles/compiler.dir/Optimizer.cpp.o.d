@@ -159,8 +159,10 @@ CMakeFiles/compiler.dir/Optimizer.cpp.o: \
  /usr/include/c++/13/pstl/glue_memory_defs.h \
  /usr/include/c++/13/pstl/execution_defs.h \
  /home/runner/work/RevivalBCPL/RevivalBCPL/Lexer.h \
- /usr/include/c++/13/cstdint /usr/include/c++/13/set \
- /usr/include/c++/13/bits/stl_tree.h \
+ /usr/include/c++/13/cstdint \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/PassManager.h \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/OptimizationPass.h \
+ /usr/include/c++/13/set /usr/include/c++/13/bits/stl_tree.h \
  /usr/include/c++/13/bits/node_handle.h \
  /usr/include/c++/13/bits/stl_set.h \
  /usr/include/c++/13/bits/stl_multiset.h \
@@ -170,4 +172,6 @@ CMakeFiles/compiler.dir/Optimizer.cpp.o: \
  /usr/include/c++/13/bits/hashtable_policy.h \
  /usr/include/c++/13/bits/enable_special_members.h \
  /home/runner/work/RevivalBCPL/RevivalBCPL/LoopOptimizer.h \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/ConstantFoldingPass.h \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/LoopInvariantCodeMotionPass.h \
  /usr/include/c++/13/stdexcept

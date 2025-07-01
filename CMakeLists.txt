@@ -26,6 +26,9 @@ add_executable(compiler
         DebugPrinter.cpp
         Optimizer.cpp
         LoopOptimizer.cpp
+        PassManager.cpp
+        ConstantFoldingPass.cpp
+        LoopInvariantCodeMotionPass.cpp
         LabelManager.cpp
         ScratchAllocator.cpp
         RegisterManager.cpp

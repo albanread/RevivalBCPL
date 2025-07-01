@@ -161,6 +161,8 @@ CMakeFiles/compiler.dir/LoopOptimizer.cpp.o: \
  /home/runner/work/RevivalBCPL/RevivalBCPL/Lexer.h \
  /usr/include/c++/13/cstdint \
  /home/runner/work/RevivalBCPL/RevivalBCPL/Optimizer.h \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/PassManager.h \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/OptimizationPass.h \
  /usr/include/c++/13/set /usr/include/c++/13/bits/stl_tree.h \
  /usr/include/c++/13/bits/node_handle.h \
  /usr/include/c++/13/bits/stl_set.h \

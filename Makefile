@@ -201,6 +201,30 @@ DebugPrinter.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/DebugPrinter.cpp.s
 .PHONY : DebugPrinter.cpp.s
 
+ExpressionCodeGenerator.o: ExpressionCodeGenerator.cpp.o
+.PHONY : ExpressionCodeGenerator.o
+
+# target to build an object file
+ExpressionCodeGenerator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o
+.PHONY : ExpressionCodeGenerator.cpp.o
+
+ExpressionCodeGenerator.i: ExpressionCodeGenerator.cpp.i
+.PHONY : ExpressionCodeGenerator.i
+
+# target to preprocess a source file
+ExpressionCodeGenerator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.i
+.PHONY : ExpressionCodeGenerator.cpp.i
+
+ExpressionCodeGenerator.s: ExpressionCodeGenerator.cpp.s
+.PHONY : ExpressionCodeGenerator.s
+
+# target to generate assembly for a file
+ExpressionCodeGenerator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.s
+.PHONY : ExpressionCodeGenerator.cpp.s
+
 JitRuntime.o: JitRuntime.cpp.o
 .PHONY : JitRuntime.o
 
@@ -417,6 +441,30 @@ ScratchAllocator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/ScratchAllocator.cpp.s
 .PHONY : ScratchAllocator.cpp.s
 
+StatementCodeGenerator.o: StatementCodeGenerator.cpp.o
+.PHONY : StatementCodeGenerator.o
+
+# target to build an object file
+StatementCodeGenerator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o
+.PHONY : StatementCodeGenerator.cpp.o
+
+StatementCodeGenerator.i: StatementCodeGenerator.cpp.i
+.PHONY : StatementCodeGenerator.i
+
+# target to preprocess a source file
+StatementCodeGenerator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.i
+.PHONY : StatementCodeGenerator.cpp.i
+
+StatementCodeGenerator.s: StatementCodeGenerator.cpp.s
+.PHONY : StatementCodeGenerator.s
+
+# target to generate assembly for a file
+StatementCodeGenerator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.s
+.PHONY : StatementCodeGenerator.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -459,6 +507,9 @@ help:
 	@echo "... DebugPrinter.o"
 	@echo "... DebugPrinter.i"
 	@echo "... DebugPrinter.s"
+	@echo "... ExpressionCodeGenerator.o"
+	@echo "... ExpressionCodeGenerator.i"
+	@echo "... ExpressionCodeGenerator.s"
 	@echo "... JitRuntime.o"
 	@echo "... JitRuntime.i"
 	@echo "... JitRuntime.s"
@@ -486,6 +537,9 @@ help:
 	@echo "... ScratchAllocator.o"
 	@echo "... ScratchAllocator.i"
 	@echo "... ScratchAllocator.s"
+	@echo "... StatementCodeGenerator.o"
+	@echo "... StatementCodeGenerator.i"
+	@echo "... StatementCodeGenerator.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

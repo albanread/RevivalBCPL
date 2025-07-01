@@ -6,6 +6,8 @@ compiler: \
   CMakeFiles/compiler.dir/Lexer.cpp.o \
   CMakeFiles/compiler.dir/Parser.cpp.o \
   CMakeFiles/compiler.dir/CodeGenerator.cpp.o \
+  CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o \
+  CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o \
   CMakeFiles/compiler.dir/AArch64Instructions.cpp.o \
   CMakeFiles/compiler.dir/JitRuntime.cpp.o \
   CMakeFiles/compiler.dir/DebugPrinter.cpp.o \
@@ -57,6 +59,10 @@ CMakeFiles/compiler.dir/Lexer.cpp.o:
 CMakeFiles/compiler.dir/Parser.cpp.o:
 
 CMakeFiles/compiler.dir/CodeGenerator.cpp.o:
+
+CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o:
+
+CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o:
 
 CMakeFiles/compiler.dir/AArch64Instructions.cpp.o:
 

@@ -199,6 +199,8 @@ CMakeFiles/compiler.dir/CodeGenerator.cpp.o: \
  /usr/include/c++/13/bits/ostream.tcc \
  /usr/include/c++/13/bits/istream.tcc \
  /usr/include/c++/13/bits/sstream.tcc \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/StatementCodeGenerator.h \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/ExpressionCodeGenerator.h \
  /home/runner/work/RevivalBCPL/RevivalBCPL/StringAccess.h \
  /home/runner/work/RevivalBCPL/RevivalBCPL/VectorAllocationVisitor.h \
  /home/runner/work/RevivalBCPL/RevivalBCPL/JitRuntime.h \

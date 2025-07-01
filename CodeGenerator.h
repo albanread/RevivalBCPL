@@ -13,12 +13,19 @@
 #include <memory>
 
 class StringAccess;
+class StatementCodeGenerator;
+class ExpressionCodeGenerator;
 
 class CodeGenerator {
 public:
     CodeGenerator();
+    ~CodeGenerator(); // Need to declare destructor when using forward declarations with unique_ptr
     uintptr_t compile(ProgramPtr program);
     void printAsm() const;
+
+    // Give specialized code generators access to private members
+    friend class StatementCodeGenerator;
+    friend class ExpressionCodeGenerator;
 
 private:
     // Core components
@@ -50,6 +57,10 @@ private:
         const Statement* statement;
     };
     std::vector<PendingCase> pendingCases;
+    
+    // Specialized code generators
+    std::unique_ptr<StatementCodeGenerator> statementGenerator;
+    std::unique_ptr<ExpressionCodeGenerator> expressionGenerator;
 
     // Register constants
     const uint32_t X0 = AArch64Instructions::X0;   // Result/A register
@@ -66,44 +77,6 @@ private:
     void visitStatement(const Statement* node);
     void visitExpression(const Expression* node);
 
-    // Statement visitors
-    void visitFunctionDeclaration(const FunctionDeclaration* node);
-    void visitGlobalDeclaration(const GlobalDeclaration* node);
-    void visitManifestDeclaration(const ManifestDeclaration* node);
-    void visitLetDeclaration(const LetDeclaration* node);
-    void visitCompoundStatement(const CompoundStatement* node);
-    void visitIfStatement(const IfStatement* node);
-    void visitTestStatement(const TestStatement* node);
-    void visitWhileStatement(const WhileStatement* node);
-    void visitForStatement(const ForStatement* node);
-    void visitSwitchonStatement(const SwitchonStatement* node);
-    void visitGotoStatement(const GotoStatement* node);
-    void visitLabeledStatement(const LabeledStatement* node);
-    void visitAssignment(const Assignment* node);
-    void visitRoutineCall(const RoutineCall* node);
-    void visitReturnStatement(const ReturnStatement* node);
-    void visitResultisStatement(const ResultisStatement* node);
-    void visitBreakStatement(const BreakStatement* node);
-    void visitLoopStatement(const LoopStatement* node);
-    void visitRepeatStatement(const RepeatStatement* node);
-    void visitEndcaseStatement(const EndcaseStatement* node);
-    void visitFinishStatement(const FinishStatement* node);
-
-    // Expression visitors
-    void visitNumberLiteral(const NumberLiteral* node);
-    void visitStringLiteral(const StringLiteral* node);
-    void visitCharLiteral(const CharLiteral* node);
-    void visitVariableAccess(const VariableAccess* node);
-    void visitUnaryOp(const UnaryOp* node);
-    void visitBinaryOp(const BinaryOp* node);
-    void visitFunctionCall(const FunctionCall* node);
-    void visitConditionalExpression(const ConditionalExpression* node);
-    void visitValof(const Valof* node);
-    void visitTableConstructor(const TableConstructor* node);
-    void visitVectorConstructor(const VectorConstructor* node);
-    void visitStringAccess(const StringAccess* node);
-    void visitCharacterAccess(const CharacterAccess* node);
-
     // Code generation helpers
     void resolveLabels();
     void saveCallerSavedRegisters();
@@ -118,10 +91,6 @@ private:
     std::string formatInstruction(const std::string& mnemonic,
                                 const std::vector<std::string>& operands,
                                 const std::string& comment = "");
-    bool isSmallDenseRange(const std::vector<SwitchonStatement::SwitchCase>& cases);
-    void generateJumpTable(const std::vector<SwitchonStatement::SwitchCase>& cases, const std::string& defaultLabel);
-    void generateBinarySearchTree(const std::vector<SwitchonStatement::SwitchCase>& cases, const std::string& defaultLabel);
-    void generateBinarySearchNode(const std::vector<SwitchonStatement::SwitchCase>& cases, size_t start, size_t end, const std::string& defaultLabel);
     bool isRegisterInUse(uint32_t reg);
     void saveCalleeSavedRegisters();
     void restoreCalleeSavedRegisters();

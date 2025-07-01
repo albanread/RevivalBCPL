@@ -128,10 +128,38 @@ CMakeFiles/compiler.dir/CodeGenerator.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/CodeGenerator.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/runner/work/RevivalBCPL/RevivalBCPL/CodeGenerator.cpp -o CMakeFiles/compiler.dir/CodeGenerator.cpp.s
 
+CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o: CMakeFiles/compiler.dir/flags.make
+CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o: StatementCodeGenerator.cpp
+CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o -MF CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o.d -o CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/StatementCodeGenerator.cpp
+
+CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/runner/work/RevivalBCPL/RevivalBCPL/StatementCodeGenerator.cpp > CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.i
+
+CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/runner/work/RevivalBCPL/RevivalBCPL/StatementCodeGenerator.cpp -o CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.s
+
+CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o: CMakeFiles/compiler.dir/flags.make
+CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o: ExpressionCodeGenerator.cpp
+CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o -MF CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o.d -o CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/ExpressionCodeGenerator.cpp
+
+CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/runner/work/RevivalBCPL/RevivalBCPL/ExpressionCodeGenerator.cpp > CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.i
+
+CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/runner/work/RevivalBCPL/RevivalBCPL/ExpressionCodeGenerator.cpp -o CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.s
+
 CMakeFiles/compiler.dir/AArch64Instructions.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/AArch64Instructions.cpp.o: AArch64Instructions.cpp
 CMakeFiles/compiler.dir/AArch64Instructions.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/compiler.dir/AArch64Instructions.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/compiler.dir/AArch64Instructions.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/AArch64Instructions.cpp.o -MF CMakeFiles/compiler.dir/AArch64Instructions.cpp.o.d -o CMakeFiles/compiler.dir/AArch64Instructions.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/AArch64Instructions.cpp
 
 CMakeFiles/compiler.dir/AArch64Instructions.cpp.i: cmake_force
@@ -145,7 +173,7 @@ CMakeFiles/compiler.dir/AArch64Instructions.cpp.s: cmake_force
 CMakeFiles/compiler.dir/JitRuntime.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/JitRuntime.cpp.o: JitRuntime.cpp
 CMakeFiles/compiler.dir/JitRuntime.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/compiler.dir/JitRuntime.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/compiler.dir/JitRuntime.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/JitRuntime.cpp.o -MF CMakeFiles/compiler.dir/JitRuntime.cpp.o.d -o CMakeFiles/compiler.dir/JitRuntime.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/JitRuntime.cpp
 
 CMakeFiles/compiler.dir/JitRuntime.cpp.i: cmake_force
@@ -159,7 +187,7 @@ CMakeFiles/compiler.dir/JitRuntime.cpp.s: cmake_force
 CMakeFiles/compiler.dir/DebugPrinter.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/DebugPrinter.cpp.o: DebugPrinter.cpp
 CMakeFiles/compiler.dir/DebugPrinter.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/compiler.dir/DebugPrinter.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/compiler.dir/DebugPrinter.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/DebugPrinter.cpp.o -MF CMakeFiles/compiler.dir/DebugPrinter.cpp.o.d -o CMakeFiles/compiler.dir/DebugPrinter.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/DebugPrinter.cpp
 
 CMakeFiles/compiler.dir/DebugPrinter.cpp.i: cmake_force
@@ -173,7 +201,7 @@ CMakeFiles/compiler.dir/DebugPrinter.cpp.s: cmake_force
 CMakeFiles/compiler.dir/Optimizer.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/Optimizer.cpp.o: Optimizer.cpp
 CMakeFiles/compiler.dir/Optimizer.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/compiler.dir/Optimizer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/compiler.dir/Optimizer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/Optimizer.cpp.o -MF CMakeFiles/compiler.dir/Optimizer.cpp.o.d -o CMakeFiles/compiler.dir/Optimizer.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/Optimizer.cpp
 
 CMakeFiles/compiler.dir/Optimizer.cpp.i: cmake_force
@@ -187,7 +215,7 @@ CMakeFiles/compiler.dir/Optimizer.cpp.s: cmake_force
 CMakeFiles/compiler.dir/LoopOptimizer.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/LoopOptimizer.cpp.o: LoopOptimizer.cpp
 CMakeFiles/compiler.dir/LoopOptimizer.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/compiler.dir/LoopOptimizer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/compiler.dir/LoopOptimizer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/LoopOptimizer.cpp.o -MF CMakeFiles/compiler.dir/LoopOptimizer.cpp.o.d -o CMakeFiles/compiler.dir/LoopOptimizer.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/LoopOptimizer.cpp
 
 CMakeFiles/compiler.dir/LoopOptimizer.cpp.i: cmake_force
@@ -201,7 +229,7 @@ CMakeFiles/compiler.dir/LoopOptimizer.cpp.s: cmake_force
 CMakeFiles/compiler.dir/LabelManager.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/LabelManager.cpp.o: LabelManager.cpp
 CMakeFiles/compiler.dir/LabelManager.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/compiler.dir/LabelManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/compiler.dir/LabelManager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/LabelManager.cpp.o -MF CMakeFiles/compiler.dir/LabelManager.cpp.o.d -o CMakeFiles/compiler.dir/LabelManager.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/LabelManager.cpp
 
 CMakeFiles/compiler.dir/LabelManager.cpp.i: cmake_force
@@ -215,7 +243,7 @@ CMakeFiles/compiler.dir/LabelManager.cpp.s: cmake_force
 CMakeFiles/compiler.dir/ScratchAllocator.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/ScratchAllocator.cpp.o: ScratchAllocator.cpp
 CMakeFiles/compiler.dir/ScratchAllocator.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/compiler.dir/ScratchAllocator.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/compiler.dir/ScratchAllocator.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/ScratchAllocator.cpp.o -MF CMakeFiles/compiler.dir/ScratchAllocator.cpp.o.d -o CMakeFiles/compiler.dir/ScratchAllocator.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/ScratchAllocator.cpp
 
 CMakeFiles/compiler.dir/ScratchAllocator.cpp.i: cmake_force
@@ -229,7 +257,7 @@ CMakeFiles/compiler.dir/ScratchAllocator.cpp.s: cmake_force
 CMakeFiles/compiler.dir/RegisterManager.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/RegisterManager.cpp.o: RegisterManager.cpp
 CMakeFiles/compiler.dir/RegisterManager.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/compiler.dir/RegisterManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/compiler.dir/RegisterManager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/RegisterManager.cpp.o -MF CMakeFiles/compiler.dir/RegisterManager.cpp.o.d -o CMakeFiles/compiler.dir/RegisterManager.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/RegisterManager.cpp
 
 CMakeFiles/compiler.dir/RegisterManager.cpp.i: cmake_force
@@ -243,7 +271,7 @@ CMakeFiles/compiler.dir/RegisterManager.cpp.s: cmake_force
 CMakeFiles/compiler.dir/Preprocessor.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/Preprocessor.cpp.o: Preprocessor.cpp
 CMakeFiles/compiler.dir/Preprocessor.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/compiler.dir/Preprocessor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/compiler.dir/Preprocessor.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/Preprocessor.cpp.o -MF CMakeFiles/compiler.dir/Preprocessor.cpp.o.d -o CMakeFiles/compiler.dir/Preprocessor.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/Preprocessor.cpp
 
 CMakeFiles/compiler.dir/Preprocessor.cpp.i: cmake_force
@@ -260,6 +288,8 @@ compiler_OBJECTS = \
 "CMakeFiles/compiler.dir/Lexer.cpp.o" \
 "CMakeFiles/compiler.dir/Parser.cpp.o" \
 "CMakeFiles/compiler.dir/CodeGenerator.cpp.o" \
+"CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o" \
+"CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o" \
 "CMakeFiles/compiler.dir/AArch64Instructions.cpp.o" \
 "CMakeFiles/compiler.dir/JitRuntime.cpp.o" \
 "CMakeFiles/compiler.dir/DebugPrinter.cpp.o" \
@@ -277,6 +307,8 @@ compiler: CMakeFiles/compiler.dir/main.cpp.o
 compiler: CMakeFiles/compiler.dir/Lexer.cpp.o
 compiler: CMakeFiles/compiler.dir/Parser.cpp.o
 compiler: CMakeFiles/compiler.dir/CodeGenerator.cpp.o
+compiler: CMakeFiles/compiler.dir/StatementCodeGenerator.cpp.o
+compiler: CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o
 compiler: CMakeFiles/compiler.dir/AArch64Instructions.cpp.o
 compiler: CMakeFiles/compiler.dir/JitRuntime.cpp.o
 compiler: CMakeFiles/compiler.dir/DebugPrinter.cpp.o
@@ -289,7 +321,7 @@ compiler: CMakeFiles/compiler.dir/Preprocessor.cpp.o
 compiler: CMakeFiles/compiler.dir/build.make
 compiler: CMakeFiles/compiler.dir/compiler_depend.ts
 compiler: CMakeFiles/compiler.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking CXX executable compiler"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Linking CXX executable compiler"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/compiler.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

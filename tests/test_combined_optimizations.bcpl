@@ -1,0 +1,16 @@
+LET START() BE $(
+    LET X = 5 + 3  // Should be constant folded to 8
+    LET Y = 2 * 4  // Should be constant folded to 8
+    LET TOTAL = 0
+
+    // Loop with invariant expressions
+    FOR I = 1 TO 10 DO $(
+        TOTAL := TOTAL + (X * Y) + (2 + 3)  // X*Y and 2+3 should be hoisted
+    $)
+
+    WRITES("Total with optimizations: ")
+    WRITEN(TOTAL)
+    NEWLINE()
+    
+    FINISH
+$)

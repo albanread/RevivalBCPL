@@ -2,10 +2,24 @@
 #define OPTIMIZER_H
 
 #include "AST.h"
+#include "PassManager.h"
 #include <memory>
 #include <set>
 #include <unordered_map>
 
+/**
+ * @class Optimizer
+ * @brief Main optimization coordinator using a pass manager system.
+ * 
+ * The Optimizer class has been refactored to use a modular pass manager system.
+ * Instead of implementing optimizations directly, it now:
+ * - Sets up and configures optimization passes
+ * - Delegates optimization work to a PassManager
+ * - Maintains compatibility with existing code that expects the singleton pattern
+ * 
+ * The class still maintains the manifests map for sharing constant information
+ * between passes, and provides the same public interface as before.
+ */
 class Optimizer {
 public:
     std::unordered_map<std::string, int64_t> manifests;
@@ -18,15 +32,34 @@ public:
     Optimizer(const Optimizer&) = delete;
     Optimizer& operator=(const Optimizer&) = delete;
 
+    /**
+     * @brief Main optimization entry point using the pass manager system.
+     * @param ast The program AST to optimize
+     * @return Optimized program AST
+     */
     ProgramPtr optimize(ProgramPtr ast);
 
+    // Legacy visitor interface - kept for compatibility with LoopOptimizer
+    // These methods are used by LoopOptimizer::process and delegate to passes
     ExprPtr visit(Expression* node);
     StmtPtr visit(Statement* node);
     DeclPtr visit(Declaration* node);
 
 private:
     Optimizer() = default;
+    
+    /**
+     * @brief Set up the optimization passes in the pass manager.
+     * This method configures which passes to run and in what order.
+     */
+    void setupPasses();
 
+    std::unique_ptr<PassManager> passManager;
+    bool passesConfigured = false;
+
+    // The following visitor methods are kept for compatibility with LoopOptimizer
+    // They implement a simple pass-through visitor that doesn't do optimization
+    
     // Expression visitors
     ExprPtr visit(NumberLiteral* node);
     ExprPtr visit(FloatLiteral* node);

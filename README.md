@@ -29,6 +29,10 @@ This compiler is an active work in progress. It successfully parses BCPL source 
 * **Register Management:** Implements a robust register management system with:
     * A `RegisterManager` for tracking variables that live in callee-saved registers.
     * A `ScratchAllocator` for temporary, caller-saved registers used during expression evaluation.
+* **Modular Optimization System:** Uses a pass manager architecture for optimizations:
+    * **Constant Folding:** Evaluates constant expressions at compile-time, including arithmetic operations, comparisons, and strength reduction (e.g., multiply by 2 → left shift by 1).
+    * **Loop-Invariant Code Motion (LICM):** Hoists loop-invariant expressions outside of loops to avoid redundant computation.
+    * **Extensible Framework:** New optimization passes can be easily added by implementing the `OptimizationPass` interface.
 * **Tail Call Optimization (TCO):** The compiler can identify tail-recursive functions and generate highly efficient, loop-like assembly that avoids stack growth. This is demonstrated in the `FACT_TAIL` function.
 * **Language Support:** The compiler currently supports a core subset of BCPL features, including:
     * `LET` and `BE` declarations for functions and routines.
@@ -36,6 +40,45 @@ This compiler is an active work in progress. It successfully parses BCPL source 
     * `IF`/`THEN` conditional statements.
     * `FOR` loops.
     * Standard and tail-recursive function calls.
+
+## Adding New Optimization Passes
+
+The compiler uses a modular pass manager system that makes adding new optimizations straightforward. All optimization passes implement the `OptimizationPass` interface and are managed by the `PassManager`.
+
+### Creating a New Optimization Pass
+
+1. **Create your pass class** that inherits from `OptimizationPass`:
+   ```cpp
+   class MyOptimizationPass : public OptimizationPass {
+   public:
+       ProgramPtr apply(ProgramPtr program) override {
+           // Your optimization logic here
+           return optimized_program;
+       }
+       
+       std::string getName() const override {
+           return "MyOptimization";
+       }
+   };
+   ```
+
+2. **Register your pass** in `Optimizer::setupPasses()`:
+   ```cpp
+   void Optimizer::setupPasses() {
+       passManager->addPass(std::make_unique<ConstantFoldingPass>(manifests));
+       passManager->addPass(std::make_unique<LoopInvariantCodeMotionPass>(manifests));
+       passManager->addPass(std::make_unique<MyOptimizationPass>()); // Add your pass
+   }
+   ```
+
+3. **Update CMakeLists.txt** to include your source files.
+
+### Current Optimization Passes
+
+- **ConstantFoldingPass**: Evaluates constant expressions, eliminates dead code in conditionals, and applies strength reduction optimizations.
+- **LoopInvariantCodeMotionPass**: Moves loop-invariant expressions outside of loops to reduce redundant computation.
+
+The pass manager runs passes in sequence, with each pass receiving the output of the previous pass. This allows optimizations to build upon each other effectively.
 
 ## Building and Running
 

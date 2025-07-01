@@ -11,6 +11,9 @@ compiler: \
   CMakeFiles/compiler.dir/DebugPrinter.cpp.o \
   CMakeFiles/compiler.dir/Optimizer.cpp.o \
   CMakeFiles/compiler.dir/LoopOptimizer.cpp.o \
+  CMakeFiles/compiler.dir/PassManager.cpp.o \
+  CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o \
+  CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o \
   CMakeFiles/compiler.dir/LabelManager.cpp.o \
   CMakeFiles/compiler.dir/ScratchAllocator.cpp.o \
   CMakeFiles/compiler.dir/RegisterManager.cpp.o \
@@ -67,6 +70,12 @@ CMakeFiles/compiler.dir/DebugPrinter.cpp.o:
 CMakeFiles/compiler.dir/Optimizer.cpp.o:
 
 CMakeFiles/compiler.dir/LoopOptimizer.cpp.o:
+
+CMakeFiles/compiler.dir/PassManager.cpp.o:
+
+CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o:
+
+CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o:
 
 CMakeFiles/compiler.dir/LabelManager.cpp.o:
 

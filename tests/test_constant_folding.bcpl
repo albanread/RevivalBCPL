@@ -1,0 +1,11 @@
+LET START() BE $(
+    LET A = 2 + 3
+    LET B = A * 2
+    LET C = B + 0
+    LET D = C * 1
+    
+    WRITEN(D)
+    NEWLINE()
+    
+    FINISH
+$)

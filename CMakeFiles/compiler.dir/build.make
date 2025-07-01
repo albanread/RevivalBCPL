@@ -198,10 +198,52 @@ CMakeFiles/compiler.dir/LoopOptimizer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/LoopOptimizer.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/runner/work/RevivalBCPL/RevivalBCPL/LoopOptimizer.cpp -o CMakeFiles/compiler.dir/LoopOptimizer.cpp.s
 
+CMakeFiles/compiler.dir/PassManager.cpp.o: CMakeFiles/compiler.dir/flags.make
+CMakeFiles/compiler.dir/PassManager.cpp.o: PassManager.cpp
+CMakeFiles/compiler.dir/PassManager.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/compiler.dir/PassManager.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/PassManager.cpp.o -MF CMakeFiles/compiler.dir/PassManager.cpp.o.d -o CMakeFiles/compiler.dir/PassManager.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/PassManager.cpp
+
+CMakeFiles/compiler.dir/PassManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/compiler.dir/PassManager.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/runner/work/RevivalBCPL/RevivalBCPL/PassManager.cpp > CMakeFiles/compiler.dir/PassManager.cpp.i
+
+CMakeFiles/compiler.dir/PassManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/PassManager.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/runner/work/RevivalBCPL/RevivalBCPL/PassManager.cpp -o CMakeFiles/compiler.dir/PassManager.cpp.s
+
+CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o: CMakeFiles/compiler.dir/flags.make
+CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o: ConstantFoldingPass.cpp
+CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o -MF CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o.d -o CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/ConstantFoldingPass.cpp
+
+CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/runner/work/RevivalBCPL/RevivalBCPL/ConstantFoldingPass.cpp > CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.i
+
+CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/runner/work/RevivalBCPL/RevivalBCPL/ConstantFoldingPass.cpp -o CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.s
+
+CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o: CMakeFiles/compiler.dir/flags.make
+CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o: LoopInvariantCodeMotionPass.cpp
+CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o -MF CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o.d -o CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/LoopInvariantCodeMotionPass.cpp
+
+CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/runner/work/RevivalBCPL/RevivalBCPL/LoopInvariantCodeMotionPass.cpp > CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.i
+
+CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/runner/work/RevivalBCPL/RevivalBCPL/LoopInvariantCodeMotionPass.cpp -o CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.s
+
 CMakeFiles/compiler.dir/LabelManager.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/LabelManager.cpp.o: LabelManager.cpp
 CMakeFiles/compiler.dir/LabelManager.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/compiler.dir/LabelManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/compiler.dir/LabelManager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/LabelManager.cpp.o -MF CMakeFiles/compiler.dir/LabelManager.cpp.o.d -o CMakeFiles/compiler.dir/LabelManager.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/LabelManager.cpp
 
 CMakeFiles/compiler.dir/LabelManager.cpp.i: cmake_force
@@ -215,7 +257,7 @@ CMakeFiles/compiler.dir/LabelManager.cpp.s: cmake_force
 CMakeFiles/compiler.dir/ScratchAllocator.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/ScratchAllocator.cpp.o: ScratchAllocator.cpp
 CMakeFiles/compiler.dir/ScratchAllocator.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/compiler.dir/ScratchAllocator.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/compiler.dir/ScratchAllocator.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/ScratchAllocator.cpp.o -MF CMakeFiles/compiler.dir/ScratchAllocator.cpp.o.d -o CMakeFiles/compiler.dir/ScratchAllocator.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/ScratchAllocator.cpp
 
 CMakeFiles/compiler.dir/ScratchAllocator.cpp.i: cmake_force
@@ -229,7 +271,7 @@ CMakeFiles/compiler.dir/ScratchAllocator.cpp.s: cmake_force
 CMakeFiles/compiler.dir/RegisterManager.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/RegisterManager.cpp.o: RegisterManager.cpp
 CMakeFiles/compiler.dir/RegisterManager.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/compiler.dir/RegisterManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/compiler.dir/RegisterManager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/RegisterManager.cpp.o -MF CMakeFiles/compiler.dir/RegisterManager.cpp.o.d -o CMakeFiles/compiler.dir/RegisterManager.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/RegisterManager.cpp
 
 CMakeFiles/compiler.dir/RegisterManager.cpp.i: cmake_force
@@ -243,7 +285,7 @@ CMakeFiles/compiler.dir/RegisterManager.cpp.s: cmake_force
 CMakeFiles/compiler.dir/Preprocessor.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/Preprocessor.cpp.o: Preprocessor.cpp
 CMakeFiles/compiler.dir/Preprocessor.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/compiler.dir/Preprocessor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/compiler.dir/Preprocessor.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/Preprocessor.cpp.o -MF CMakeFiles/compiler.dir/Preprocessor.cpp.o.d -o CMakeFiles/compiler.dir/Preprocessor.cpp.o -c /home/runner/work/RevivalBCPL/RevivalBCPL/Preprocessor.cpp
 
 CMakeFiles/compiler.dir/Preprocessor.cpp.i: cmake_force
@@ -265,6 +307,9 @@ compiler_OBJECTS = \
 "CMakeFiles/compiler.dir/DebugPrinter.cpp.o" \
 "CMakeFiles/compiler.dir/Optimizer.cpp.o" \
 "CMakeFiles/compiler.dir/LoopOptimizer.cpp.o" \
+"CMakeFiles/compiler.dir/PassManager.cpp.o" \
+"CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o" \
+"CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o" \
 "CMakeFiles/compiler.dir/LabelManager.cpp.o" \
 "CMakeFiles/compiler.dir/ScratchAllocator.cpp.o" \
 "CMakeFiles/compiler.dir/RegisterManager.cpp.o" \
@@ -282,6 +327,9 @@ compiler: CMakeFiles/compiler.dir/JitRuntime.cpp.o
 compiler: CMakeFiles/compiler.dir/DebugPrinter.cpp.o
 compiler: CMakeFiles/compiler.dir/Optimizer.cpp.o
 compiler: CMakeFiles/compiler.dir/LoopOptimizer.cpp.o
+compiler: CMakeFiles/compiler.dir/PassManager.cpp.o
+compiler: CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o
+compiler: CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o
 compiler: CMakeFiles/compiler.dir/LabelManager.cpp.o
 compiler: CMakeFiles/compiler.dir/ScratchAllocator.cpp.o
 compiler: CMakeFiles/compiler.dir/RegisterManager.cpp.o
@@ -289,7 +337,7 @@ compiler: CMakeFiles/compiler.dir/Preprocessor.cpp.o
 compiler: CMakeFiles/compiler.dir/build.make
 compiler: CMakeFiles/compiler.dir/compiler_depend.ts
 compiler: CMakeFiles/compiler.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking CXX executable compiler"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/runner/work/RevivalBCPL/RevivalBCPL/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Linking CXX executable compiler"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/compiler.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -1,37 +1,30 @@
-#include "Optimizer.h"
-#include "LoopOptimizer.h"
-#include "ConstantFoldingPass.h"
 #include "LoopInvariantCodeMotionPass.h"
+#include "LoopOptimizer.h"
+#include "Optimizer.h"
 #include <stdexcept>
-#include <vector>
 
-void Optimizer::setupPasses() {
-    if (passesConfigured) return;
-    
-    passManager = std::make_unique<PassManager>();
-    
-    // Add optimization passes in the desired order
-    // 1. Constant folding first to simplify expressions
-    passManager->addPass(std::make_unique<ConstantFoldingPass>(manifests));
-    
-    // 2. Loop-invariant code motion after constant folding
-    passManager->addPass(std::make_unique<LoopInvariantCodeMotionPass>(manifests));
-    
-    passesConfigured = true;
+LoopInvariantCodeMotionPass::LoopInvariantCodeMotionPass(const std::unordered_map<std::string, int64_t>& manifests)
+    : manifests(manifests) {}
+
+ProgramPtr LoopInvariantCodeMotionPass::apply(ProgramPtr program) {
+    return visit(program.get());
 }
 
-ProgramPtr Optimizer::optimize(ProgramPtr ast) {
-    setupPasses();
-    return passManager->runPasses(std::move(ast));
+std::string LoopInvariantCodeMotionPass::getName() const {
+    return "LoopInvariantCodeMotion";
 }
 
-// --- Legacy Visitor Interface ---
-// These methods are kept for compatibility with LoopOptimizer::process
-// They implement simple pass-through visitors without optimization
+std::unique_ptr<Optimizer> LoopInvariantCodeMotionPass::createOptimizerHelper() {
+    // We need to create an Optimizer instance to use with LoopOptimizer::process
+    // Since Optimizer is a singleton, we'll use getInstance() and set up manifests
+    auto& optimizer = Optimizer::getInstance();
+    optimizer.manifests = manifests;
+    return nullptr; // We'll use the reference to the singleton
+}
 
 // --- Visitor Dispatchers ---
 
-ExprPtr Optimizer::visit(Expression* node) {
+ExprPtr LoopInvariantCodeMotionPass::visit(Expression* node) {
     if (!node) return nullptr;
     if (auto* n = dynamic_cast<NumberLiteral*>(node)) return visit(n);
     if (auto* n = dynamic_cast<FloatLiteral*>(node)) return visit(n);
@@ -45,10 +38,10 @@ ExprPtr Optimizer::visit(Expression* node) {
     if (auto* n = dynamic_cast<Valof*>(node)) return visit(n);
     if (auto* n = dynamic_cast<VectorConstructor*>(node)) return visit(n);
     if (auto* n = dynamic_cast<VectorAccess*>(node)) return visit(n);
-    throw std::runtime_error("Optimizer: Unsupported Expression node.");
+    throw std::runtime_error("LoopInvariantCodeMotionPass: Unsupported Expression node.");
 }
 
-StmtPtr Optimizer::visit(Statement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(Statement* node) {
     if (!node) return nullptr;
     if (auto* n = dynamic_cast<Assignment*>(node)) return visit(n);
     if (auto* n = dynamic_cast<RoutineCall*>(node)) return visit(n);
@@ -66,22 +59,22 @@ StmtPtr Optimizer::visit(Statement* node) {
     if (auto* n = dynamic_cast<Declaration*>(node)) return visit(n);
     if (auto* n = dynamic_cast<SwitchonStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<EndcaseStatement*>(node)) return visit(n);
-    throw std::runtime_error("Optimizer: Unsupported Statement node.");
+    throw std::runtime_error("LoopInvariantCodeMotionPass: Unsupported Statement node.");
 }
 
-DeclPtr Optimizer::visit(Declaration* node) {
+DeclPtr LoopInvariantCodeMotionPass::visit(Declaration* node) {
     if (!node) return nullptr;
     if (auto* n = dynamic_cast<LetDeclaration*>(node)) return visit(n);
     if (auto* n = dynamic_cast<FunctionDeclaration*>(node)) return visit(n);
     if (dynamic_cast<GlobalDeclaration*>(node) || dynamic_cast<ManifestDeclaration*>(node) || dynamic_cast<GetDirective*>(node)) {
         return nullptr;
     }
-    throw std::runtime_error("Optimizer: Unsupported Declaration node.");
+    throw std::runtime_error("LoopInvariantCodeMotionPass: Unsupported Declaration node.");
 }
 
-// --- Top-Level and Declarations ---
+// --- Top-Level ---
 
-ProgramPtr Optimizer::visit(Program* node) {
+ProgramPtr LoopInvariantCodeMotionPass::visit(Program* node) {
     std::vector<DeclPtr> new_decls;
     for (const auto& decl : node->declarations) {
         if (DeclPtr optimized_decl = visit(decl.get())) {
@@ -91,7 +84,9 @@ ProgramPtr Optimizer::visit(Program* node) {
     return std::make_unique<Program>(std::move(new_decls));
 }
 
-DeclPtr Optimizer::visit(LetDeclaration* node) {
+// --- Declaration Visitors (pass-through) ---
+
+DeclPtr LoopInvariantCodeMotionPass::visit(LetDeclaration* node) {
     std::vector<LetDeclaration::VarInit> new_inits;
     for (const auto& init : node->initializers) {
         ExprPtr optimized_init = init.init ? visit(init.init.get()) : nullptr;
@@ -100,7 +95,7 @@ DeclPtr Optimizer::visit(LetDeclaration* node) {
     return std::make_unique<LetDeclaration>(std::move(new_inits));
 }
 
-DeclPtr Optimizer::visit(FunctionDeclaration* node) {
+DeclPtr LoopInvariantCodeMotionPass::visit(FunctionDeclaration* node) {
     auto new_body_stmt = node->body_stmt ? visit(node->body_stmt.get()) : nullptr;
     auto new_body_expr = node->body_expr ? visit(node->body_expr.get()) : nullptr;
     return std::make_unique<FunctionDeclaration>(node->name, node->params, std::move(new_body_expr), std::move(new_body_stmt));
@@ -108,42 +103,42 @@ DeclPtr Optimizer::visit(FunctionDeclaration* node) {
 
 // --- Expression Visitors (pass-through) ---
 
-ExprPtr Optimizer::visit(NumberLiteral* node) { 
+ExprPtr LoopInvariantCodeMotionPass::visit(NumberLiteral* node) { 
     return std::make_unique<NumberLiteral>(*node); 
 }
 
-ExprPtr Optimizer::visit(FloatLiteral* node) { 
+ExprPtr LoopInvariantCodeMotionPass::visit(FloatLiteral* node) { 
     return std::make_unique<FloatLiteral>(*node); 
 }
 
-ExprPtr Optimizer::visit(StringLiteral* node) { 
+ExprPtr LoopInvariantCodeMotionPass::visit(StringLiteral* node) { 
     return std::make_unique<StringLiteral>(*node); 
 }
 
-ExprPtr Optimizer::visit(CharLiteral* node) { 
+ExprPtr LoopInvariantCodeMotionPass::visit(CharLiteral* node) { 
     return std::make_unique<CharLiteral>(*node); 
 }
 
-ExprPtr Optimizer::visit(VariableAccess* node) {
+ExprPtr LoopInvariantCodeMotionPass::visit(VariableAccess* node) {
     return std::make_unique<VariableAccess>(*node);
 }
 
-ExprPtr Optimizer::visit(UnaryOp* node) {
+ExprPtr LoopInvariantCodeMotionPass::visit(UnaryOp* node) {
     auto new_rhs = visit(node->rhs.get());
     return std::make_unique<UnaryOp>(node->op, std::move(new_rhs));
 }
 
-ExprPtr Optimizer::visit(BinaryOp* node) {
+ExprPtr LoopInvariantCodeMotionPass::visit(BinaryOp* node) {
     auto left = visit(node->left.get());
     auto right = visit(node->right.get());
     return std::make_unique<BinaryOp>(node->op, std::move(left), std::move(right));
 }
 
-ExprPtr Optimizer::visit(ConditionalExpression* node) {
+ExprPtr LoopInvariantCodeMotionPass::visit(ConditionalExpression* node) {
     return std::make_unique<ConditionalExpression>(visit(node->condition.get()), visit(node->trueExpr.get()), visit(node->falseExpr.get()));
 }
 
-ExprPtr Optimizer::visit(FunctionCall* node) {
+ExprPtr LoopInvariantCodeMotionPass::visit(FunctionCall* node) {
     auto new_func = visit(node->function.get());
     std::vector<ExprPtr> new_args;
     for (const auto& arg : node->arguments) {
@@ -152,21 +147,21 @@ ExprPtr Optimizer::visit(FunctionCall* node) {
     return std::make_unique<FunctionCall>(std::move(new_func), std::move(new_args));
 }
 
-ExprPtr Optimizer::visit(Valof* node) { 
+ExprPtr LoopInvariantCodeMotionPass::visit(Valof* node) { 
     return std::make_unique<Valof>(visit(node->body.get())); 
 }
 
-ExprPtr Optimizer::visit(VectorConstructor* node) { 
+ExprPtr LoopInvariantCodeMotionPass::visit(VectorConstructor* node) { 
     return std::make_unique<VectorConstructor>(visit(node->size.get())); 
 }
 
-ExprPtr Optimizer::visit(VectorAccess* node) { 
+ExprPtr LoopInvariantCodeMotionPass::visit(VectorAccess* node) { 
     return std::make_unique<VectorAccess>(visit(node->vector.get()), visit(node->index.get())); 
 }
 
-// --- Statement Visitors (pass-through) ---
+// --- Statement Visitors ---
 
-StmtPtr Optimizer::visit(CompoundStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(CompoundStatement* node) {
     std::vector<StmtPtr> new_stmts;
     for (const auto& stmt : node->statements) {
         if(auto new_stmt = visit(stmt.get())) {
@@ -176,7 +171,7 @@ StmtPtr Optimizer::visit(CompoundStatement* node) {
     return std::make_unique<CompoundStatement>(std::move(new_stmts));
 }
 
-StmtPtr Optimizer::visit(Assignment* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(Assignment* node) {
     std::vector<ExprPtr> new_lhs;
     for (const auto& expr : node->lhs) {
         new_lhs.push_back(visit(expr.get()));
@@ -188,61 +183,57 @@ StmtPtr Optimizer::visit(Assignment* node) {
     return std::make_unique<Assignment>(std::move(new_lhs), std::move(new_rhs));
 }
 
-StmtPtr Optimizer::visit(IfStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(IfStatement* node) {
     return std::make_unique<IfStatement>(visit(node->condition.get()), visit(node->then_statement.get()));
 }
 
-StmtPtr Optimizer::visit(TestStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(TestStatement* node) {
     auto new_then = visit(node->then_statement.get());
     auto new_else = node->else_statement ? visit(node->else_statement.get()) : nullptr;
     return std::make_unique<TestStatement>(visit(node->condition.get()), std::move(new_then), std::move(new_else));
 }
 
-StmtPtr Optimizer::visit(WhileStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(WhileStatement* node) {
     return std::make_unique<WhileStatement>(visit(node->condition.get()), visit(node->body.get()));
 }
 
-StmtPtr Optimizer::visit(RepeatStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(RepeatStatement* node) {
     return std::make_unique<RepeatStatement>(visit(node->body.get()), visit(node->condition.get()));
 }
 
-StmtPtr Optimizer::visit(ForStatement* node) {
-    // Simple pass-through for ForStatement - no optimization here
-    ExprPtr new_from = visit(node->from_expr.get());
-    ExprPtr new_to = visit(node->to_expr.get());
-    ExprPtr new_by = node->by_expr ? visit(node->by_expr.get()) : nullptr;
-    StmtPtr new_body = visit(node->body.get());
+StmtPtr LoopInvariantCodeMotionPass::visit(ForStatement* node) {
+    // This is where LICM happens - delegate to the existing LoopOptimizer
+    auto& optimizer = Optimizer::getInstance();
+    optimizer.manifests = manifests;
     
-    return std::make_unique<ForStatement>(
-        node->var_name, std::move(new_from), std::move(new_to), std::move(new_by), std::move(new_body)
-    );
+    return LoopOptimizer::process(node, &optimizer);
 }
 
-StmtPtr Optimizer::visit(RoutineCall* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(RoutineCall* node) {
     return std::make_unique<RoutineCall>(visit(node->call_expression.get()));
 }
 
-StmtPtr Optimizer::visit(LabeledStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(LabeledStatement* node) {
     return std::make_unique<LabeledStatement>(node->name, visit(node->statement.get()));
 }
 
-StmtPtr Optimizer::visit(GotoStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(GotoStatement* node) {
     return std::make_unique<GotoStatement>(visit(node->label.get()));
 }
 
-StmtPtr Optimizer::visit(ResultisStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(ResultisStatement* node) {
     return std::make_unique<ResultisStatement>(visit(node->value.get()));
 }
 
-StmtPtr Optimizer::visit(ReturnStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(ReturnStatement* node) {
     return std::make_unique<ReturnStatement>();
 }
 
-StmtPtr Optimizer::visit(FinishStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(FinishStatement* node) {
     return std::make_unique<FinishStatement>();
 }
 
-StmtPtr Optimizer::visit(SwitchonStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(SwitchonStatement* node) {
     auto new_expr = visit(node->expression.get());
     std::vector<SwitchonStatement::SwitchCase> new_cases;
     for (auto& scase : node->cases) {
@@ -252,6 +243,6 @@ StmtPtr Optimizer::visit(SwitchonStatement* node) {
     return std::make_unique<SwitchonStatement>(std::move(new_expr), std::move(new_cases), std::move(new_default));
 }
 
-StmtPtr Optimizer::visit(EndcaseStatement* node) {
+StmtPtr LoopInvariantCodeMotionPass::visit(EndcaseStatement* node) {
     return std::make_unique<EndcaseStatement>();
 }

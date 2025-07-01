@@ -1,0 +1,14 @@
+# Build artifacts
+compiler
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.o
+*.a
+*.so
+
+# Debug and output files
+debug_output.txt
+*.s
+*.asm

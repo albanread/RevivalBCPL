@@ -129,6 +129,19 @@ compiler/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/build
 .PHONY : compiler/fast
 
+#=============================================================================
+# Target rules for targets named test_jit_memory_manager
+
+# Build rule for target.
+test_jit_memory_manager: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_jit_memory_manager
+.PHONY : test_jit_memory_manager
+
+# fast build rule for target.
+test_jit_memory_manager/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/build
+.PHONY : test_jit_memory_manager/fast
+
 AArch64Instructions.o: AArch64Instructions.cpp.o
 .PHONY : AArch64Instructions.o
 
@@ -248,6 +261,33 @@ ExpressionCodeGenerator.s: ExpressionCodeGenerator.cpp.s
 ExpressionCodeGenerator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.s
 .PHONY : ExpressionCodeGenerator.cpp.s
+
+JITMemoryManager.o: JITMemoryManager.cpp.o
+.PHONY : JITMemoryManager.o
+
+# target to build an object file
+JITMemoryManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/JITMemoryManager.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/JITMemoryManager.cpp.o
+.PHONY : JITMemoryManager.cpp.o
+
+JITMemoryManager.i: JITMemoryManager.cpp.i
+.PHONY : JITMemoryManager.i
+
+# target to preprocess a source file
+JITMemoryManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/JITMemoryManager.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/JITMemoryManager.cpp.i
+.PHONY : JITMemoryManager.cpp.i
+
+JITMemoryManager.s: JITMemoryManager.cpp.s
+.PHONY : JITMemoryManager.s
+
+# target to generate assembly for a file
+JITMemoryManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/JITMemoryManager.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/JITMemoryManager.cpp.s
+.PHONY : JITMemoryManager.cpp.s
 
 JitRuntime.o: JitRuntime.cpp.o
 .PHONY : JitRuntime.o
@@ -561,6 +601,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+test_jit_memory_manager.o: test_jit_memory_manager.cpp.o
+.PHONY : test_jit_memory_manager.o
+
+# target to build an object file
+test_jit_memory_manager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/test_jit_memory_manager.cpp.o
+.PHONY : test_jit_memory_manager.cpp.o
+
+test_jit_memory_manager.i: test_jit_memory_manager.cpp.i
+.PHONY : test_jit_memory_manager.i
+
+# target to preprocess a source file
+test_jit_memory_manager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/test_jit_memory_manager.cpp.i
+.PHONY : test_jit_memory_manager.cpp.i
+
+test_jit_memory_manager.s: test_jit_memory_manager.cpp.s
+.PHONY : test_jit_memory_manager.s
+
+# target to generate assembly for a file
+test_jit_memory_manager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_jit_memory_manager.dir/build.make CMakeFiles/test_jit_memory_manager.dir/test_jit_memory_manager.cpp.s
+.PHONY : test_jit_memory_manager.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -570,6 +634,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... compiler"
+	@echo "... test_jit_memory_manager"
 	@echo "... AArch64Instructions.o"
 	@echo "... AArch64Instructions.i"
 	@echo "... AArch64Instructions.s"
@@ -585,6 +650,9 @@ help:
 	@echo "... ExpressionCodeGenerator.o"
 	@echo "... ExpressionCodeGenerator.i"
 	@echo "... ExpressionCodeGenerator.s"
+	@echo "... JITMemoryManager.o"
+	@echo "... JITMemoryManager.i"
+	@echo "... JITMemoryManager.s"
 	@echo "... JitRuntime.o"
 	@echo "... JitRuntime.i"
 	@echo "... JitRuntime.s"
@@ -624,6 +692,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... test_jit_memory_manager.o"
+	@echo "... test_jit_memory_manager.i"
+	@echo "... test_jit_memory_manager.s"
 .PHONY : help
 
 

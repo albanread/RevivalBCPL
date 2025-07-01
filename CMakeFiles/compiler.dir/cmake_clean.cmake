@@ -10,6 +10,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/compiler.dir/DebugPrinter.cpp.o.d"
   "CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o"
   "CMakeFiles/compiler.dir/ExpressionCodeGenerator.cpp.o.d"
+  "CMakeFiles/compiler.dir/JITMemoryManager.cpp.o"
+  "CMakeFiles/compiler.dir/JITMemoryManager.cpp.o.d"
   "CMakeFiles/compiler.dir/JitRuntime.cpp.o"
   "CMakeFiles/compiler.dir/JitRuntime.cpp.o.d"
   "CMakeFiles/compiler.dir/LabelManager.cpp.o"

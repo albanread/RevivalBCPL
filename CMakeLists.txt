@@ -23,6 +23,7 @@ add_executable(compiler
         ExpressionCodeGenerator.cpp
         AArch64Instructions.cpp
         JitRuntime.cpp
+        JITMemoryManager.cpp
         DebugPrinter.cpp
         Optimizer.cpp
         LoopOptimizer.cpp
@@ -33,6 +34,12 @@ add_executable(compiler
         ScratchAllocator.cpp
         RegisterManager.cpp
         Preprocessor.cpp
+)
+
+# Add test executable for JITMemoryManager
+add_executable(test_jit_memory_manager
+        test_jit_memory_manager.cpp
+        JITMemoryManager.cpp
 )
 
 if(APPLE)

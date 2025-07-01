@@ -48,4 +48,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/compiler.dir/DependInfo.cmake"
+  "CMakeFiles/test_jit_memory_manager.dir/DependInfo.cmake"
   )

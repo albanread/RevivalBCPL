@@ -177,6 +177,30 @@ CodeGenerator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/CodeGenerator.cpp.s
 .PHONY : CodeGenerator.cpp.s
 
+ConstantFoldingPass.o: ConstantFoldingPass.cpp.o
+.PHONY : ConstantFoldingPass.o
+
+# target to build an object file
+ConstantFoldingPass.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.o
+.PHONY : ConstantFoldingPass.cpp.o
+
+ConstantFoldingPass.i: ConstantFoldingPass.cpp.i
+.PHONY : ConstantFoldingPass.i
+
+# target to preprocess a source file
+ConstantFoldingPass.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.i
+.PHONY : ConstantFoldingPass.cpp.i
+
+ConstantFoldingPass.s: ConstantFoldingPass.cpp.s
+.PHONY : ConstantFoldingPass.s
+
+# target to generate assembly for a file
+ConstantFoldingPass.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/ConstantFoldingPass.cpp.s
+.PHONY : ConstantFoldingPass.cpp.s
+
 DebugPrinter.o: DebugPrinter.cpp.o
 .PHONY : DebugPrinter.o
 
@@ -297,6 +321,30 @@ Lexer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/Lexer.cpp.s
 .PHONY : Lexer.cpp.s
 
+LoopInvariantCodeMotionPass.o: LoopInvariantCodeMotionPass.cpp.o
+.PHONY : LoopInvariantCodeMotionPass.o
+
+# target to build an object file
+LoopInvariantCodeMotionPass.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.o
+.PHONY : LoopInvariantCodeMotionPass.cpp.o
+
+LoopInvariantCodeMotionPass.i: LoopInvariantCodeMotionPass.cpp.i
+.PHONY : LoopInvariantCodeMotionPass.i
+
+# target to preprocess a source file
+LoopInvariantCodeMotionPass.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.i
+.PHONY : LoopInvariantCodeMotionPass.cpp.i
+
+LoopInvariantCodeMotionPass.s: LoopInvariantCodeMotionPass.cpp.s
+.PHONY : LoopInvariantCodeMotionPass.s
+
+# target to generate assembly for a file
+LoopInvariantCodeMotionPass.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/LoopInvariantCodeMotionPass.cpp.s
+.PHONY : LoopInvariantCodeMotionPass.cpp.s
+
 LoopOptimizer.o: LoopOptimizer.cpp.o
 .PHONY : LoopOptimizer.o
 
@@ -368,6 +416,30 @@ Parser.s: Parser.cpp.s
 Parser.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/Parser.cpp.s
 .PHONY : Parser.cpp.s
+
+PassManager.o: PassManager.cpp.o
+.PHONY : PassManager.o
+
+# target to build an object file
+PassManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/PassManager.cpp.o
+.PHONY : PassManager.cpp.o
+
+PassManager.i: PassManager.cpp.i
+.PHONY : PassManager.i
+
+# target to preprocess a source file
+PassManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/PassManager.cpp.i
+.PHONY : PassManager.cpp.i
+
+PassManager.s: PassManager.cpp.s
+.PHONY : PassManager.s
+
+# target to generate assembly for a file
+PassManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/PassManager.cpp.s
+.PHONY : PassManager.cpp.s
 
 Preprocessor.o: Preprocessor.cpp.o
 .PHONY : Preprocessor.o
@@ -504,6 +576,9 @@ help:
 	@echo "... CodeGenerator.o"
 	@echo "... CodeGenerator.i"
 	@echo "... CodeGenerator.s"
+	@echo "... ConstantFoldingPass.o"
+	@echo "... ConstantFoldingPass.i"
+	@echo "... ConstantFoldingPass.s"
 	@echo "... DebugPrinter.o"
 	@echo "... DebugPrinter.i"
 	@echo "... DebugPrinter.s"
@@ -519,6 +594,9 @@ help:
 	@echo "... Lexer.o"
 	@echo "... Lexer.i"
 	@echo "... Lexer.s"
+	@echo "... LoopInvariantCodeMotionPass.o"
+	@echo "... LoopInvariantCodeMotionPass.i"
+	@echo "... LoopInvariantCodeMotionPass.s"
 	@echo "... LoopOptimizer.o"
 	@echo "... LoopOptimizer.i"
 	@echo "... LoopOptimizer.s"
@@ -528,6 +606,9 @@ help:
 	@echo "... Parser.o"
 	@echo "... Parser.i"
 	@echo "... Parser.s"
+	@echo "... PassManager.o"
+	@echo "... PassManager.i"
+	@echo "... PassManager.s"
 	@echo "... Preprocessor.o"
 	@echo "... Preprocessor.i"
 	@echo "... Preprocessor.s"

@@ -2,10 +2,22 @@
 #define OPTIMIZER_H
 
 #include "AST.h"
+#include "PassManager.h"
 #include <memory>
 #include <set>
 #include <unordered_map>
 
+/**
+ * @class Optimizer
+ * @brief Main optimizer interface that uses a PassManager to apply optimization passes.
+ * 
+ * The Optimizer class has been refactored to use a modular pass-based architecture.
+ * Instead of embedding all optimization logic directly, it delegates to a PassManager
+ * that coordinates individual optimization passes.
+ * 
+ * This class retains the singleton pattern and visitor methods for compatibility
+ * with existing code (like LoopOptimizer) but now uses passes for the main optimization.
+ */
 class Optimizer {
 public:
     std::unordered_map<std::string, int64_t> manifests;
@@ -18,16 +30,25 @@ public:
     Optimizer(const Optimizer&) = delete;
     Optimizer& operator=(const Optimizer&) = delete;
 
+    /**
+     * @brief Optimize a program using the configured pass manager.
+     * @param ast The program to optimize
+     * @return The optimized program
+     */
     ProgramPtr optimize(ProgramPtr ast);
 
+    // Visitor methods retained for compatibility with existing code (e.g., LoopOptimizer)
     ExprPtr visit(Expression* node);
     StmtPtr visit(Statement* node);
     DeclPtr visit(Declaration* node);
 
 private:
-    Optimizer() = default;
+    Optimizer();
+    PassManager passManager;
 
-    // Expression visitors
+    void setupDefaultPasses();
+
+    // Expression visitors - kept for compatibility with LoopOptimizer
     ExprPtr visit(NumberLiteral* node);
     ExprPtr visit(FloatLiteral* node);
     ExprPtr visit(StringLiteral* node);
@@ -41,7 +62,7 @@ private:
     ExprPtr visit(VectorConstructor* node);
     ExprPtr visit(VectorAccess* node);
     
-    // Statement visitors
+    // Statement visitors - kept for compatibility with LoopOptimizer
     StmtPtr visit(Assignment* node);
     StmtPtr visit(RoutineCall* node);
     StmtPtr visit(CompoundStatement* node);
@@ -58,11 +79,11 @@ private:
     StmtPtr visit(SwitchonStatement* node);
     StmtPtr visit(EndcaseStatement* node);
     
-    // Declaration visitors
+    // Declaration visitors - kept for compatibility with LoopOptimizer
     DeclPtr visit(LetDeclaration* node);
     DeclPtr visit(FunctionDeclaration* node);
     
-    // Top-level visitor
+    // Top-level visitor - kept for compatibility with LoopOptimizer
     ProgramPtr visit(Program* node);
 };
 

@@ -215,4 +215,6 @@ CMakeFiles/compiler.dir/main.cpp.o: \
  /home/runner/work/RevivalBCPL/RevivalBCPL/JitRuntime.h \
  /home/runner/work/RevivalBCPL/RevivalBCPL/DebugPrinter.h \
  /home/runner/work/RevivalBCPL/RevivalBCPL/Preprocessor.h \
- /home/runner/work/RevivalBCPL/RevivalBCPL/Optimizer.h
+ /home/runner/work/RevivalBCPL/RevivalBCPL/Optimizer.h \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/PassManager.h \
+ /home/runner/work/RevivalBCPL/RevivalBCPL/OptimizationPass.h

@@ -49,9 +49,10 @@ StmtPtr LoopInvariantCodeMotionPass::visit(Statement* node) {
     if (auto* n = dynamic_cast<FinishStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<ResultisStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<RepeatStatement*>(node)) return visit(n);
-    if (auto* n = dynamic_cast<Declaration*>(node)) return visit(n);
     if (auto* n = dynamic_cast<SwitchonStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<EndcaseStatement*>(node)) return visit(n);
+    if (auto* n = dynamic_cast<DeclarationStatement*>(node)) return visit(n);
+
     throw std::runtime_error("LoopInvariantCodeMotionPass: Unsupported Statement node.");
 }
 
@@ -154,9 +155,9 @@ ExprPtr LoopInvariantCodeMotionPass::visit(VectorAccess* node) {
 // --- Statement Visitors ---
 
 StmtPtr LoopInvariantCodeMotionPass::visit(CompoundStatement* node) {
-    std::vector<StmtPtr> new_stmts;
+    std::vector<std::unique_ptr<Node>> new_stmts;
     for (const auto& stmt : node->statements) {
-        if(auto new_stmt = visit(stmt.get())) {
+        if(auto new_stmt = visit(static_cast<Statement*>(stmt.get()))) {
              new_stmts.push_back(std::move(new_stmt));
         }
     }
@@ -241,4 +242,12 @@ StmtPtr LoopInvariantCodeMotionPass::visit(SwitchonStatement* node) {
 
 StmtPtr LoopInvariantCodeMotionPass::visit(EndcaseStatement* node) {
     return std::make_unique<EndcaseStatement>(); // No children to optimize
+}
+
+StmtPtr LoopInvariantCodeMotionPass::visit(DeclarationStatement* node) {
+    // Optimize the declaration itself, then wrap it back in a DeclarationStatement
+    if (DeclPtr optimized_decl = visit(node->declaration.get())) {
+        return std::make_unique<DeclarationStatement>(std::move(optimized_decl));
+    }
+    return nullptr; // If the declaration is optimized away, return nullptr
 }

@@ -29,8 +29,12 @@ private:
     void findInlinableFunctions(Program* program);
 
     // Stage 2: Transform the AST by inlining calls.
+    ProgramPtr visit(Program* node);
     ExprPtr visit(Expression* node);
     StmtPtr visit(Statement* node);
+    DeclPtr visit(Declaration* node);
+    DeclPtr visit(FunctionDeclaration* node);
+    StmtPtr visit(CompoundStatement* node);
     // ... other visitors
 
     ExprPtr visit(FunctionCall* node); // Core transformation logic here.

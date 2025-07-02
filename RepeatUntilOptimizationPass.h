@@ -60,6 +60,7 @@ private:
     StmtPtr visit(RepeatStatement* node); // Key optimization logic is here
     StmtPtr visit(SwitchonStatement* node);
     StmtPtr visit(EndcaseStatement* node);
+    StmtPtr visit(DeclarationStatement* node);
 
     // Declaration visitors
     DeclPtr visit(LetDeclaration* node);

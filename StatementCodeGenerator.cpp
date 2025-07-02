@@ -82,7 +82,7 @@ void StatementCodeGenerator::visitLetDeclaration(const LetDeclaration* node) {
 void StatementCodeGenerator::visitCompoundStatement(const CompoundStatement* node) {
     // Simply visit each statement in the block
     for (const auto& stmt : node->statements) {
-        codeGen.visitStatement(stmt.get());
+        codeGen.visitStatement(static_cast<Statement*>(stmt.get()));
     }
 }
 
@@ -154,6 +154,11 @@ void StatementCodeGenerator::visitFinishStatement(const FinishStatement* node) {
     auto endLabel = codeGen.labelManager.getCurrentEndLabel();
     codeGen.labelManager.requestLabelFixup(endLabel, codeGen.instructions.getCurrentAddress());
     codeGen.instructions.b(endLabel, "Finish current construct");
+}
+
+void StatementCodeGenerator::visitDeclarationStatement(const DeclarationStatement* node) {
+    // Delegate to CodeGenerator's visitDeclaration to handle the inner declaration
+    codeGen.visitDeclaration(node->declaration.get());
 }
 
 // Helper methods for switch statement generation

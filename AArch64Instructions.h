@@ -34,6 +34,8 @@ public:
     static const uint32_t X5 = 5;
     static const uint32_t X6 = 6;
     static const uint32_t X7 = 7;
+    static const uint32_t X9 = 9;
+    static const uint32_t X10 = 10;
     static const uint32_t X28 = 28; // Global pointer (G)
     static const uint32_t X29 = 29; // Frame pointer (FP)
     static const uint32_t X30 = 30; // Link register (LR)
@@ -118,6 +120,8 @@ public:
 
     void neg(uint32_t rd, uint32_t rm, const std::string& comment = "");
     void eor(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment = "");
+    void and_op(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment = "");
+    void orr(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment = "");
     void cmp(uint32_t rn, uint32_t rm, const std::string& comment = "");
     void beq(const std::string& label, const std::string& comment = "");
     void bne(const std::string& label, const std::string& comment = "");

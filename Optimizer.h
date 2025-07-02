@@ -78,6 +78,7 @@ private:
     StmtPtr visit(RepeatStatement* node);
     StmtPtr visit(SwitchonStatement* node);
     StmtPtr visit(EndcaseStatement* node);
+    StmtPtr visit(DeclarationStatement* node);
     
     // Declaration visitors - kept for compatibility with LoopOptimizer
     DeclPtr visit(LetDeclaration* node);

@@ -1,4 +1,5 @@
 #include "JITMemoryManager.h"
+#include <string>
 
 // Platform-specific includes
 #ifdef _WIN32
@@ -72,7 +73,7 @@ void* JITMemoryManager::allocate(size_t size) {
         
         return memory_;
     } catch (const std::exception& e) {
-        throw JITMemoryManagerException("Failed to allocate " + std::to_string(size) + 
+        throw JITMemoryManagerException(std::string("Failed to allocate ") + std::to_string(size) + 
                                        " bytes: " + e.what());
     }
 }
@@ -90,7 +91,7 @@ void JITMemoryManager::makeExecutable() {
         platformSetPermissions(memory_, size_, true);
         is_executable_ = true;
     } catch (const std::exception& e) {
-        throw JITMemoryManagerException("Failed to make memory executable: " + std::string(e.what()));
+        throw JITMemoryManagerException(std::string("Failed to make memory executable: ") + e.what());
     }
 }
 
@@ -107,7 +108,7 @@ void JITMemoryManager::makeWritable() {
         platformSetPermissions(memory_, size_, false);
         is_executable_ = false;
     } catch (const std::exception& e) {
-        throw JITMemoryManagerException("Failed to make memory writable: " + std::string(e.what()));
+        throw JITMemoryManagerException(std::string("Failed to make memory writable: ") + e.what());
     }
 }
 
@@ -179,7 +180,7 @@ void* JITMemoryManager::platformAllocate(size_t size) {
     void* ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     
     if (ptr == MAP_FAILED) {
-        throw std::runtime_error("mmap failed: " + std::string(strerror(errno)));
+        throw std::runtime_error(std::string("mmap failed: ") + strerror(errno));
     }
     
     return ptr;
@@ -204,7 +205,7 @@ void JITMemoryManager::platformSetPermissions(void* ptr, size_t size, bool execu
     }
     
     if (mprotect(ptr, size, protection) != 0) {
-        throw std::runtime_error("mprotect failed: " + std::string(strerror(errno)));
+        throw std::runtime_error(std::string("mprotect failed: ") + strerror(errno));
     }
 }
 

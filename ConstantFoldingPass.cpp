@@ -47,9 +47,10 @@ StmtPtr ConstantFoldingPass::visit(Statement* node) {
     if (auto* n = dynamic_cast<FinishStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<ResultisStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<RepeatStatement*>(node)) return visit(n);
-    if (auto* n = dynamic_cast<Declaration*>(node)) return visit(n);
     if (auto* n = dynamic_cast<SwitchonStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<EndcaseStatement*>(node)) return visit(n);
+    if (auto* n = dynamic_cast<DeclarationStatement*>(node)) return visit(n);
+
     throw std::runtime_error("ConstantFoldingPass: Unsupported Statement node.");
 }
 
@@ -221,9 +222,9 @@ ExprPtr ConstantFoldingPass::visit(VectorAccess* node) {
 // --- Statement Visitors ---
 
 StmtPtr ConstantFoldingPass::visit(CompoundStatement* node) {
-    std::vector<StmtPtr> new_stmts;
+    std::vector<std::unique_ptr<Node>> new_stmts;
     for (const auto& stmt : node->statements) {
-        if(auto new_stmt = visit(stmt.get())) {
+        if(auto new_stmt = visit(static_cast<Statement*>(stmt.get()))) {
              new_stmts.push_back(std::move(new_stmt));
         }
     }
@@ -249,7 +250,7 @@ StmtPtr ConstantFoldingPass::visit(IfStatement* node) {
         if (cond_lit->value != 0) {
             return visit(node->then_statement.get());
         } else {
-            return std::make_unique<CompoundStatement>(std::vector<StmtPtr>());
+            return std::make_unique<CompoundStatement>(std::vector<std::unique_ptr<Node>>());
         }
     }
     return std::make_unique<IfStatement>(std::move(new_cond), visit(node->then_statement.get()));
@@ -262,7 +263,7 @@ StmtPtr ConstantFoldingPass::visit(TestStatement* node) {
         if (cond_lit->value != 0) {
             return visit(node->then_statement.get());
         } else {
-            return node->else_statement ? visit(node->else_statement.get()) : std::make_unique<CompoundStatement>(std::vector<StmtPtr>());
+            return node->else_statement ? visit(node->else_statement.get()) : std::make_unique<CompoundStatement>(std::vector<std::unique_ptr<Node>>());
         }
     }
     auto new_then = visit(node->then_statement.get());
@@ -324,4 +325,12 @@ StmtPtr ConstantFoldingPass::visit(SwitchonStatement* node) {
 
 StmtPtr ConstantFoldingPass::visit(EndcaseStatement* node) {
     return std::make_unique<EndcaseStatement>(); // No children to optimize
+}
+
+StmtPtr ConstantFoldingPass::visit(DeclarationStatement* node) {
+    // Optimize the declaration itself, then wrap it back in a DeclarationStatement
+    if (DeclPtr optimized_decl = visit(node->declaration.get())) {
+        return std::make_unique<DeclarationStatement>(std::move(optimized_decl));
+    }
+    return nullptr; // If the declaration is optimized away, return nullptr
 }

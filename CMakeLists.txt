@@ -30,14 +30,15 @@ add_executable(compiler
         PassManager.cpp
         ConstantFoldingPass.cpp
         LoopInvariantCodeMotionPass.cpp
+        FunctionInliningPass.cpp
+        RepeatUntilOptimizationPass.cpp
+        CommonSubexpressionEliminationPass.cpp
+        DeadCodeEliminationPass.cpp
         LabelManager.cpp
         ScratchAllocator.cpp
         RegisterManager.cpp
         Preprocessor.cpp
-        CommonSubexpressionEliminationPass.cpp
-        DeadCodeEliminationPass.cpp
-        FunctionInliningPass.cpp
-        RepeatUntilOptimizationPass.cpp
+        AST.cpp
 )
 
 # Add test executable for JITMemoryManager

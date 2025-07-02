@@ -43,7 +43,11 @@ ProgramPtr Parser::parse(const std::string& source) {
 
     std::vector<DeclPtr> declarations;
     while (currentToken.type != TokenType::Eof) {
-        declarations.push_back(parseDeclaration());
+        if (currentToken.type == TokenType::KwLet || currentToken.type == TokenType::KwGlobal || currentToken.type == TokenType::KwManifest) {
+            declarations.push_back(parseDeclaration());
+        } else {
+            throw std::runtime_error("Parser Error: Expected top-level declaration or statement.");
+        }
     }
 
     return std::make_unique<Program>(std::move(declarations));
@@ -198,7 +202,7 @@ StmtPtr Parser::parseStatement() {
     std::cout << "parseStatement: " << currentToken.text << std::endl;
     switch (currentToken.type) {
         case TokenType::KwLet:
-             return parseLetDeclaration();
+            return std::make_unique<DeclarationStatement>(parseLetDeclaration());
         case TokenType::KwIf:
         case TokenType::KwUnless:
             return parseIfStatement();
@@ -252,9 +256,9 @@ StmtPtr Parser::parseStatement() {
 StmtPtr Parser::parseCompoundStatement() {
     expect(currentToken.type == TokenType::LSection || currentToken.type == TokenType::LBrace ? currentToken.type : TokenType::LSection, "Expected '$(' or '{' to start a block.");
     
-    std::vector<StmtPtr> statements;
+    std::vector<std::unique_ptr<Node>> statements;
     while(currentToken.type != TokenType::RSection && currentToken.type != TokenType::RBrace && currentToken.type != TokenType::Eof) {
-        statements.push_back(parseStatement());
+        statements.push_back(std::move(parseStatement()));
         if(currentToken.type == TokenType::Semicolon) {
             advanceTokens();
         }

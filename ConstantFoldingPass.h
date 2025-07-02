@@ -63,6 +63,7 @@ private:
     StmtPtr visit(RepeatStatement* node);
     StmtPtr visit(SwitchonStatement* node);
     StmtPtr visit(EndcaseStatement* node);
+    StmtPtr visit(DeclarationStatement* node);
     
     // Declaration visitors
     DeclPtr visit(LetDeclaration* node);

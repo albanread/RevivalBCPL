@@ -66,17 +66,7 @@ void CodeGenerator::visitProgram(const Program* node) {
 
     // Second pass: generate code for declarations
     for (const auto& decl : node->declarations) {
-        if (auto funcDecl = dynamic_cast<const FunctionDeclaration*>(decl.get())) {
-            statementGenerator->visitFunctionDeclaration(funcDecl);
-        } else if (auto letDecl = dynamic_cast<const LetDeclaration*>(decl.get())) {
-            statementGenerator->visitLetDeclaration(letDecl);
-        } else if (auto globalDecl = dynamic_cast<const GlobalDeclaration*>(decl.get())) {
-            statementGenerator->visitGlobalDeclaration(globalDecl);
-        } else if (auto manifestDecl = dynamic_cast<const ManifestDeclaration*>(decl.get())) {
-            statementGenerator->visitManifestDeclaration(manifestDecl);
-        } else if (auto valof = dynamic_cast<const Valof*>(decl.get())) {
-            expressionGenerator->visitValof(valof);
-        }
+        visitDeclaration(decl.get());
     }
 }
 
@@ -117,6 +107,22 @@ void CodeGenerator::visitStatement(const Statement* stmt) {
         statementGenerator->visitEndcaseStatement(endcaseStmt);
     } else if (auto finishStmt = dynamic_cast<const FinishStatement*>(stmt)) {
         statementGenerator->visitFinishStatement(finishStmt);
+    } else if (auto declStmt = dynamic_cast<const DeclarationStatement*>(stmt)) {
+        statementGenerator->visitDeclarationStatement(declStmt);
+    }
+}
+
+void CodeGenerator::visitDeclaration(const Declaration* decl) {
+    if (auto funcDecl = dynamic_cast<const FunctionDeclaration*>(decl)) {
+        statementGenerator->visitFunctionDeclaration(funcDecl);
+    } else if (auto letDecl = dynamic_cast<const LetDeclaration*>(decl)) {
+        statementGenerator->visitLetDeclaration(letDecl);
+    } else if (auto globalDecl = dynamic_cast<const GlobalDeclaration*>(decl)) {
+        statementGenerator->visitGlobalDeclaration(globalDecl);
+    } else if (auto manifestDecl = dynamic_cast<const ManifestDeclaration*>(decl)) {
+        statementGenerator->visitManifestDeclaration(manifestDecl);
+    } else if (auto valof = dynamic_cast<const Valof*>(decl)) {
+        expressionGenerator->visitValof(valof);
     }
 }
 

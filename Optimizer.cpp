@@ -2,6 +2,10 @@
 #include "LoopOptimizer.h"
 #include "ConstantFoldingPass.h"
 #include "LoopInvariantCodeMotionPass.h"
+#include "FunctionInliningPass.h"
+#include "RepeatUntilOptimizationPass.h"
+#include "CommonSubexpressionEliminationPass.h"
+#include "DeadCodeEliminationPass.h"
 #include <stdexcept>
 #include <vector>
 
@@ -21,8 +25,8 @@ void Optimizer::setupDefaultPasses() {
     passManager.addPass(std::make_unique<RepeatUntilOptimizationPass>(manifests));
     passManager.addPass(std::make_unique<LoopInvariantCodeMotionPass>(manifests));
     passManager.addPass(std::make_unique<CommonSubexpressionEliminationPass>());
-    passManager.addPass(std::make_unique<DeadCodeEliminationPass>());
-}}
+        passManager.addPass(std::make_unique<DeadCodeEliminationPass>());
+}
 
 ProgramPtr Optimizer::optimize(ProgramPtr ast) {
     return passManager.optimize(std::move(ast));
@@ -62,11 +66,11 @@ StmtPtr Optimizer::visit(Statement* node) {
     if (auto* n = dynamic_cast<FinishStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<ResultisStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<RepeatStatement*>(node)) return visit(n);
-    if (auto* n = dynamic_cast<Declaration*>(node)) return visit(n);
 
     // FIX: Added dispatch cases for missing statement types
     if (auto* n = dynamic_cast<SwitchonStatement*>(node)) return visit(n);
     if (auto* n = dynamic_cast<EndcaseStatement*>(node)) return visit(n);
+    if (auto* n = dynamic_cast<DeclarationStatement*>(node)) return visit(n);
 
     throw std::runtime_error("Optimizer: Unsupported Statement node.");
 }
@@ -204,9 +208,9 @@ ExprPtr Optimizer::visit(VectorAccess* node) { return std::make_unique<VectorAcc
 // --- Statement Visitors ---
 
 StmtPtr Optimizer::visit(CompoundStatement* node) {
-    std::vector<StmtPtr> new_stmts;
+    std::vector<std::unique_ptr<Node>> new_stmts;
     for (const auto& stmt : node->statements) {
-        if(auto new_stmt = visit(stmt.get())) {
+        if(auto new_stmt = visit(static_cast<Statement*>(stmt.get()))) {
              new_stmts.push_back(std::move(new_stmt));
         }
     }
@@ -231,7 +235,7 @@ StmtPtr Optimizer::visit(IfStatement* node) {
         if (cond_lit->value != 0) {
             return visit(node->then_statement.get());
         } else {
-            return std::make_unique<CompoundStatement>(std::vector<StmtPtr>());
+            return std::make_unique<CompoundStatement>(std::vector<std::unique_ptr<Node>>());
         }
     }
     return std::make_unique<IfStatement>(std::move(new_cond), visit(node->then_statement.get()));
@@ -243,7 +247,7 @@ StmtPtr Optimizer::visit(TestStatement* node) {
         if (cond_lit->value != 0) {
             return visit(node->then_statement.get());
         } else {
-            return node->else_statement ? visit(node->else_statement.get()) : std::make_unique<CompoundStatement>(std::vector<StmtPtr>());
+            return node->else_statement ? visit(node->else_statement.get()) : std::make_unique<CompoundStatement>(std::vector<std::unique_ptr<Node>>());
         }
     }
     auto new_then = visit(node->then_statement.get());
@@ -302,4 +306,12 @@ StmtPtr Optimizer::visit(SwitchonStatement* node) {
 
 StmtPtr Optimizer::visit(EndcaseStatement* node) {
     return std::make_unique<EndcaseStatement>(); // No children to optimize
+}
+
+StmtPtr Optimizer::visit(DeclarationStatement* node) {
+    // Optimize the declaration itself, then wrap it back in a DeclarationStatement
+    if (DeclPtr optimized_decl = visit(node->declaration.get())) {
+        return std::make_unique<DeclarationStatement>(std::move(optimized_decl));
+    }
+    return nullptr; // If the declaration is optimized away, return nullptr
 }

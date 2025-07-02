@@ -92,6 +92,8 @@ struct Token {
     double float_val;      // For floating-point literals
     uint32_t line;         // Line number for error reporting
     uint32_t col;          // Column number for error reporting
+
+    static std::string tokenTypeToString(TokenType type);
 };
 
 /**

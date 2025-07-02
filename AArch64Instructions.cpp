@@ -211,6 +211,16 @@ void AArch64Instructions::eor(uint32_t rd, uint32_t rn, uint32_t rm, const std::
     addInstruction({encoding, "eor " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment, false, "", getCurrentAddress()});
 }
 
+void AArch64Instructions::and_op(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
+    uint32_t encoding = 0x8A000000 | (rm << 16) | (rn << 5) | rd;
+    addInstruction({encoding, "and " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment, false, "", getCurrentAddress()});
+}
+
+void AArch64Instructions::orr(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
+    uint32_t encoding = 0xAA000000 | (rm << 16) | (rn << 5) | rd;
+    addInstruction({encoding, "orr " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment, false, "", getCurrentAddress()});
+}
+
 void AArch64Instructions::cmp(uint32_t rn, uint32_t rm, const std::string& comment) {
     uint32_t encoding = 0xEB00001F | (rm << 16) | (rn << 5); // SUBS XZR, rn, rm
     addInstruction({encoding, "cmp " + regName(rn) + ", " + regName(rm), comment, false, "", getCurrentAddress()});

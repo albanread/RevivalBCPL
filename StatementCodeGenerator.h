@@ -41,6 +41,7 @@ public:
     void visitRepeatStatement(const RepeatStatement* node);
     void visitEndcaseStatement(const EndcaseStatement* node);
     void visitFinishStatement(const FinishStatement* node);
+    void visitDeclarationStatement(const DeclarationStatement* node);
 
 private:
     CodeGenerator& codeGen;

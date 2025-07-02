@@ -76,6 +76,8 @@ private:
     void visitProgram(const Program* node);
     void visitStatement(const Statement* node);
     void visitExpression(const Expression* node);
+    void visitDeclarationStatement(const DeclarationStatement* node);
+    void visitDeclaration(const Declaration* node);
 
     // Code generation helpers
     void resolveLabels();

@@ -26,7 +26,7 @@ void ModifiedVariableCollector::visit(Statement* node) {
             }
         }
     } else if (auto* n = dynamic_cast<CompoundStatement*>(node)) {
-        for (const auto& s : n->statements) visit(s.get());
+        for (const auto& s : n->statements) visit(static_cast<Statement*>(s.get()));
     } else if (auto* n = dynamic_cast<IfStatement*>(node)) {
         visit(n->then_statement.get());
     } else if (auto* n = dynamic_cast<TestStatement*>(node)) {
@@ -198,9 +198,9 @@ StmtPtr HoistingOptimizer::visit(Assignment* node) {
 }
 
 StmtPtr HoistingOptimizer::visit(CompoundStatement* node) {
-    std::vector<StmtPtr> new_stmts;
+    std::vector<std::unique_ptr<Node>> new_stmts;
     for (const auto& stmt : node->statements) {
-        new_stmts.push_back(visit(stmt.get()));
+        new_stmts.push_back(visit(static_cast<Statement*>(stmt.get())));
     }
     return std::make_unique<CompoundStatement>(std::move(new_stmts));
 }
@@ -261,9 +261,9 @@ StmtPtr process(ForStatement* loop, Optimizer* optimizer) {
     if (hoisted_decls.empty()) {
         return new_loop;
     } else {
-        std::vector<StmtPtr> final_statements;
+        std::vector<std::unique_ptr<Node>> final_statements;
         for (auto& decl : hoisted_decls) {
-            final_statements.push_back(std::move(decl));
+            final_statements.push_back(std::make_unique<DeclarationStatement>(std::move(decl)));
         }
         final_statements.push_back(std::move(new_loop));
         return std::make_unique<CompoundStatement>(std::move(final_statements));

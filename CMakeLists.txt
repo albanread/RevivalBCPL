@@ -34,6 +34,10 @@ add_executable(compiler
         ScratchAllocator.cpp
         RegisterManager.cpp
         Preprocessor.cpp
+        CommonSubexpressionEliminationPass.cpp
+        DeadCodeEliminationPass.cpp
+        FunctionInliningPass.cpp
+        RepeatUntilOptimizationPass.cpp
 )
 
 # Add test executable for JITMemoryManager

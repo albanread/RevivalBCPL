@@ -15,17 +15,20 @@ Optimizer::Optimizer() {
 
 void Optimizer::setupDefaultPasses() {
     passManager.addPass(std::make_unique<ConstantFoldingPass>(manifests));
-    
+
     // Inlining creates many new opportunities for other passes.
     passManager.addPass(std::make_unique<FunctionInliningPass>());
-    
+
     // Rerun constant folding to clean up after inlining.
     passManager.addPass(std::make_unique<ConstantFoldingPass>(manifests));
 
     passManager.addPass(std::make_unique<RepeatUntilOptimizationPass>(manifests));
     passManager.addPass(std::make_unique<LoopInvariantCodeMotionPass>(manifests));
-    passManager.addPass(std::make_unique<CommonSubexpressionEliminationPass>());
-        passManager.addPass(std::make_unique<DeadCodeEliminationPass>());
+//    passManager.addPass(std::make_unique<CommonSubexpressionEliminationPass>());
+    auto livenessPass = std::make_unique<LivenessAnalysisPass>();
+    LivenessAnalysisPass* livenessPassPtr = livenessPass.get();
+    passManager.addPass(std::move(livenessPass)); // Add LivenessAnalysisPass
+    passManager.addPass(std::make_unique<DeadCodeEliminationPass>(livenessPassPtr));
 }
 
 ProgramPtr Optimizer::optimize(ProgramPtr ast) {

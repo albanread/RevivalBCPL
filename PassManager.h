@@ -3,6 +3,7 @@
 
 #include "OptimizationPass.h"
 #include "AST.h"
+#include "LivenessAnalysisPass.h"
 #include <vector>
 #include <memory>
 
@@ -37,6 +38,10 @@ public:
     
 private:
     std::vector<std::unique_ptr<OptimizationPass>> passes;
+    LivenessAnalysisPass* livenessAnalysisPass = nullptr; // Pointer to the LivenessAnalysisPass instance
+
+public:
+    LivenessAnalysisPass* getLivenessAnalysisPass() const { return livenessAnalysisPass; }
 };
 
 #endif // PASS_MANAGER_H

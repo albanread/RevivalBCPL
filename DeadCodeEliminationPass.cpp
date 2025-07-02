@@ -7,9 +7,11 @@ std::string DeadCodeEliminationPass::getName() const {
 }
 
 ProgramPtr DeadCodeEliminationPass::apply(ProgramPtr program) {
-    // Stage 1: Analyze the entire program to find live variables.
-    liveVariables.clear();
-    // TODO: Implement proper live variable analysis by traversing the AST.
+    // The LivenessAnalysisPass should have already run and populated its data.
+    // We don't need to do a separate analysis stage here.
+
+    // The LivenessAnalysisPass should have already run and populated its data.
+    // We don't need to do a separate analysis stage here.
 
     // Stage 2: Transform the AST to remove dead code.
     return visit(program.get());
@@ -22,11 +24,24 @@ ProgramPtr DeadCodeEliminationPass::apply(ProgramPtr program) {
 DeclPtr DeadCodeEliminationPass::visit(LetDeclaration* node) {
     std::vector<LetDeclaration::VarInit> liveInits;
     for (const auto& init : node->initializers) {
-        // Keep the declaration if the variable is in the live set.
-        if (liveVariables.count(init.name)) {
-            ExprPtr optimized_init = init.init ? visit(init.init.get()) : nullptr;
-            liveInits.push_back({init.name, std::move(optimized_init)});
-        }
+        // A variable is considered live if it's live-out of the statement.
+        // For a LET declaration, we check if the declared variable is live after the declaration.
+        // This is a simplification; a more precise analysis would check if the variable is used later.
+        // For now, if the variable is not live-out of the declaration statement, we consider it dead.
+        // This requires the LivenessAnalysisPass to have populated live-out for statements.
+        // If the variable is part of the live-out set of the statement containing this declaration, keep it.
+        // This is a placeholder logic and needs refinement based on how LivenessAnalysisPass populates data.
+        // For now, we'll assume if the variable is not live-out of the *entire program*, it's dead.
+        // This is a very coarse check and will be improved.
+        bool is_live = false;
+        // This part needs to be properly integrated with LivenessAnalysisPass.
+        // For now, we'll keep all declarations to avoid incorrect removal until liveness is fully integrated.
+        // Once LivenessAnalysisPass provides per-statement liveness, this logic will be updated.
+        
+        // Temporarily, keep all declarations to avoid breaking compilation.
+        // The actual DCE logic will go here once liveness information is available.
+        ExprPtr optimized_init = init.init ? visit(init.init.get()) : nullptr;
+        liveInits.push_back({init.name, std::move(optimized_init)});
     }
 
     if (liveInits.empty()) {
@@ -36,17 +51,7 @@ DeclPtr DeadCodeEliminationPass::visit(LetDeclaration* node) {
 }
 
 StmtPtr DeadCodeEliminationPass::visit(Assignment* node) {
-    if (node->lhs.size() == 1) {
-        if (auto* var = dynamic_cast<VariableAccess*>(node->lhs[0].get())) {
-            // If the variable being assigned to is not live, remove the assignment.
-            if (liveVariables.find(var->name) == liveVariables.end()) {
-                // Return an empty statement to effectively remove the assignment.
-                return std::make_unique<CompoundStatement>(std::vector<std::unique_ptr<Node>>());
-            }
-        }
-    }
-    // If the variable is live, rebuild the assignment statement.
-    // (A full implementation would be here)
+    // First, optimize the RHS expressions
     std::vector<ExprPtr> new_lhs;
     for (const auto& expr : node->lhs) {
         new_lhs.push_back(visit(expr.get()));
@@ -55,6 +60,21 @@ StmtPtr DeadCodeEliminationPass::visit(Assignment* node) {
     for (const auto& expr : node->rhs) {
         new_rhs.push_back(visit(expr.get()));
     }
+
+    // Check if the assignment is dead
+    if (node->lhs.size() == 1) {
+        if (auto* var_access = dynamic_cast<VariableAccess*>(node->lhs[0].get())) {
+            // If the variable being assigned to is not live *after* this statement,
+            // then this assignment is dead.
+            const std::set<std::string>& live_out = livenessAnalysis->getLiveOut(node);
+            if (live_out.find(var_access->name) == live_out.end()) {
+                // The assigned variable is not live, so this assignment is dead.
+                // Replace it with an empty compound statement.
+                return std::make_unique<CompoundStatement>(std::vector<std::unique_ptr<Node>>());
+            }
+        }
+    }
+    // If not dead, return the (potentially optimized) assignment
     return std::make_unique<Assignment>(std::move(new_lhs), std::move(new_rhs));
 }
 

@@ -2,6 +2,7 @@
 #define DEAD_CODE_ELIMINATION_PASS_H
 
 #include "OptimizationPass.h"
+#include "LivenessAnalysisPass.h"
 #include "AST.h"
 #include <set>
 #include <memory>
@@ -16,12 +17,18 @@
  */
 class DeadCodeEliminationPass : public OptimizationPass {
 public:
+    DeadCodeEliminationPass(LivenessAnalysisPass* livenessPass) : livenessAnalysis(livenessPass) {}
+
+private:
+    LivenessAnalysisPass* livenessAnalysis; // Pointer to the liveness analysis pass
+
+public:
     ProgramPtr apply(ProgramPtr program) override;
     std::string getName() const override;
 
 private:
     // --- Analysis Stage ---
-    std::set<std::string> liveVariables;
+    
     void analyzeNode(Node* node);
 
     // --- Transformation Stage ---

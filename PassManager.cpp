@@ -1,6 +1,9 @@
 #include "PassManager.h"
 
 void PassManager::addPass(std::unique_ptr<OptimizationPass> pass) {
+    if (LivenessAnalysisPass* liveness = dynamic_cast<LivenessAnalysisPass*>(pass.get())) {
+        livenessAnalysisPass = liveness;
+    }
     passes.push_back(std::move(pass));
 }
 

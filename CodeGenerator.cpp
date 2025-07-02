@@ -51,6 +51,9 @@ uintptr_t CodeGenerator::compile(ProgramPtr program) {
     if (it == functions.end()) {
         throw std::runtime_error("No START function found");
     }
+
+    finalizeCode(); // Call finalizeCode to generate the assembly listing
+
     return it->second;
 }
 
@@ -256,7 +259,17 @@ void CodeGenerator::restoreCalleeSavedRegisters() {
 }
 
 void CodeGenerator::finalizeCode() {
-    // Implementation placeholder
+    // Compute addresses for all instructions
+    instructions.computeAddresses();
+
+    // Resolve all branch targets
+    instructions.resolveAllBranches();
+
+    // Perform peephole optimization
+    performPeepholeOptimization();
+
+    // Generate final assembly listing
+    generateAssemblyListing();
 }
 
 void CodeGenerator::resolveBranchTargets() {
@@ -268,7 +281,25 @@ void CodeGenerator::performPeepholeOptimization() {
 }
 
 void CodeGenerator::generateAssemblyListing() {
-    // Implementation placeholder
+    assemblyListing.clear();
+    assemblyListing << ".text\n";
+    assemblyListing << ".align 4\n\n";
+
+    for (const auto& instr : instructions.getInstructions()) {
+        if (instr.hasLabel) {
+            assemblyListing << instr.label << ":\n";
+        }
+        assemblyListing << "\t" << instr.toString() << "\n";
+    }
+
+    // Print string pool
+    if (!stringPool.empty()) {
+        assemblyListing << "\n.data\n";
+        for (size_t i = 0; i < stringPool.size(); ++i) {
+            assemblyListing << ".L.str" << i << ":\n";
+            assemblyListing << "    .string \"" << stringPool[i] << "\"\n";
+        }
+    }
 }
 
 bool CodeGenerator::canCombineLoadStore(const AArch64Instructions::Instruction& instr1, const AArch64Instructions::Instruction& instr2) {
@@ -280,5 +311,8 @@ void CodeGenerator::combineLoadStore(AArch64Instructions::Instruction& instr1, A
 }
 
 void CodeGenerator::printAsm() const {
-    std::cout << assemblyListing.str() << std::endl;
+    std::cout << "\n;------------ Generated ARM64 Assembly ------------\n\n";
+    std::cout << assemblyListing.str();
+    std::cout << "\n;------------ End of Assembly ------------\n\n";
 }
+

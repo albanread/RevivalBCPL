@@ -3,6 +3,7 @@
 
 #include "AST.h"
 #include "PassManager.h"
+#include "LivenessAnalysisPass.h" // Include the new LivenessAnalysisPass
 #include <memory>
 #include <set>
 #include <unordered_map>

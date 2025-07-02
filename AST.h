@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include "Lexer.h" // For TokenType
+#include "ASTVisitor.h" // Include for ASTVisitor
 
 // --- Forward Declarations ---
 class Expression;
@@ -24,6 +25,7 @@ class Node {
 public:
     virtual ~Node() = default;
     virtual std::unique_ptr<Node> clone() const = 0;
+    virtual void accept(ASTVisitor* visitor) = 0;
 };
 
 // --- Expression Nodes ---
@@ -39,6 +41,7 @@ public:
     NumberLiteral(int64_t val) : value(val) {}
     int64_t value;
     ExprPtr cloneExpr() const override { return std::make_unique<NumberLiteral>(*this); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a floating-point literal.
@@ -47,6 +50,7 @@ public:
     FloatLiteral(double val) : value(val) {}
     double value;
     ExprPtr cloneExpr() const override { return std::make_unique<FloatLiteral>(*this); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a string literal.
@@ -55,6 +59,7 @@ public:
     StringLiteral(std::string val) : value(std::move(val)) {}
     std::string value;
     ExprPtr cloneExpr() const override { return std::make_unique<StringLiteral>(*this); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a character literal.
@@ -63,6 +68,7 @@ public:
     CharLiteral(int64_t val) : value(val) {}
     int64_t value;
     ExprPtr cloneExpr() const override { return std::make_unique<CharLiteral>(*this); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents accessing a variable by its name.
@@ -71,6 +77,7 @@ public:
     VariableAccess(std::string name) : name(std::move(name)) {}
     std::string name;
     ExprPtr cloneExpr() const override { return std::make_unique<VariableAccess>(*this); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a unary operation (e.g., @E, ~E, !E).
@@ -80,6 +87,7 @@ public:
     TokenType op;
     ExprPtr rhs;
     ExprPtr cloneExpr() const override { return std::make_unique<UnaryOp>(op, rhs->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a binary operation (e.g., E1 + E2, E1 = E2).
@@ -91,6 +99,7 @@ public:
     ExprPtr left;
     ExprPtr right;
     ExprPtr cloneExpr() const override { return std::make_unique<BinaryOp>(op, left->cloneExpr(), right->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a function call.
@@ -107,6 +116,7 @@ public:
         }
         return std::make_unique<FunctionCall>(function->cloneExpr(), std::move(new_args));
     }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a conditional expression (E1 -> E2, E3).
@@ -120,6 +130,7 @@ public:
     ExprPtr trueExpr;
     ExprPtr falseExpr;
     ExprPtr cloneExpr() const override { return std::make_unique<ConditionalExpression>(condition->cloneExpr(), trueExpr->cloneExpr(), falseExpr->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // --- Statement Nodes ---
@@ -150,18 +161,21 @@ public:
         }
         return std::make_unique<SwitchonStatement>(expression->cloneExpr(), std::move(new_cases), default_case ? default_case->cloneStmt() : nullptr);
     }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a BREAK statement.
 class BreakStatement : public Statement {
 public:
     StmtPtr cloneStmt() const override { return std::make_unique<BreakStatement>(); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a LOOP statement.
 class LoopStatement : public Statement {
 public:
     StmtPtr cloneStmt() const override { return std::make_unique<LoopStatement>(); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a REPEAT UNTIL loop.
@@ -172,12 +186,14 @@ public:
     StmtPtr body;
     ExprPtr condition;
     StmtPtr cloneStmt() const override { return std::make_unique<RepeatStatement>(body->cloneStmt(), condition->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents an ENDCASE statement.
 class EndcaseStatement : public Statement {
 public:
     StmtPtr cloneStmt() const override { return std::make_unique<EndcaseStatement>(); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // --- New Expression Node Definitions ---
@@ -185,6 +201,7 @@ public:
 class TableConstructor : public Expression {
 public:
     ExprPtr cloneExpr() const override { return std::make_unique<TableConstructor>(); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a vector constructor.
@@ -193,6 +210,7 @@ public:
     explicit VectorConstructor(ExprPtr size) : size(std::move(size)) {}
     ExprPtr size;
     ExprPtr cloneExpr() const override { return std::make_unique<VectorConstructor>(size->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a VALOF block.
@@ -201,6 +219,7 @@ public:
     explicit Valof(StmtPtr body) : body(std::move(body)) {}
     StmtPtr body;
     ExprPtr cloneExpr() const override { return std::make_unique<Valof>(body->cloneStmt()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a dereference expression (e.g., !P).
@@ -209,6 +228,7 @@ public:
     explicit DereferenceExpr(ExprPtr ptr) : pointer(std::move(ptr)) {}
     ExprPtr pointer;
     ExprPtr cloneExpr() const override { return std::make_unique<DereferenceExpr>(pointer->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a vector access expression (e.g., V!I).
@@ -218,6 +238,7 @@ public:
     ExprPtr vector;
     ExprPtr index;
     ExprPtr cloneExpr() const override { return std::make_unique<VectorAccess>(vector->cloneExpr(), index->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a character access expression (e.g., S%I).
@@ -227,6 +248,7 @@ public:
     ExprPtr string;
     ExprPtr index;
     ExprPtr cloneExpr() const override { return std::make_unique<CharacterAccess>(string->cloneExpr(), index->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents an assignment (e.g., V!i := E).
@@ -247,6 +269,7 @@ public:
         }
         return std::make_unique<Assignment>(std::move(new_lhs), std::move(new_rhs));
     }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a call to a routine (which doesn't return a value).
@@ -255,6 +278,7 @@ public:
     explicit RoutineCall(ExprPtr call_expr) : call_expression(std::move(call_expr)) {}
     ExprPtr call_expression;
     StmtPtr cloneStmt() const override { return std::make_unique<RoutineCall>(call_expression->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a block of statements, e.g., $( C1; C2 $)
@@ -269,6 +293,7 @@ public:
         }
         return std::make_unique<CompoundStatement>(std::move(new_stmts));
     }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 
@@ -280,6 +305,7 @@ public:
     ExprPtr condition;
     StmtPtr then_statement;
     StmtPtr cloneStmt() const override { return std::make_unique<IfStatement>(condition->cloneExpr(), then_statement->cloneStmt()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a TEST command.
@@ -293,6 +319,7 @@ public:
     StmtPtr then_statement;
     StmtPtr else_statement;
     StmtPtr cloneStmt() const override { return std::make_unique<TestStatement>(condition->cloneExpr(), then_statement->cloneStmt(), else_statement ? else_statement->cloneStmt() : nullptr); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a WHILE/UNTIL loop.
@@ -303,6 +330,7 @@ public:
     ExprPtr condition;
     StmtPtr body;
     StmtPtr cloneStmt() const override { return std::make_unique<WhileStatement>(condition->cloneExpr(), body->cloneStmt()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a FOR loop.
@@ -317,6 +345,7 @@ public:
     ExprPtr by_expr; // Can be nullptr for default BY 1
     StmtPtr body;
     StmtPtr cloneStmt() const override { return std::make_unique<ForStatement>(var_name, from_expr->cloneExpr(), to_expr->cloneExpr(), by_expr ? by_expr->cloneExpr() : nullptr, body->cloneStmt()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a GOTO statement.
@@ -325,6 +354,7 @@ public:
     explicit GotoStatement(ExprPtr label_expr) : label(std::move(label_expr)) {}
     ExprPtr label;
     StmtPtr cloneStmt() const override { return std::make_unique<GotoStatement>(label->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a labeled statement.
@@ -334,12 +364,14 @@ public:
     std::string name;
     StmtPtr statement;
     StmtPtr cloneStmt() const override { return std::make_unique<LabeledStatement>(name, statement->cloneStmt()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a RETURN statement.
 class ReturnStatement : public Statement {
 public:
     StmtPtr cloneStmt() const override { return std::make_unique<ReturnStatement>(); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 class DeclarationStatement : public Statement {
@@ -347,12 +379,14 @@ public:
     explicit DeclarationStatement(DeclPtr decl) : declaration(std::move(decl)) {}
     DeclPtr declaration;
     StmtPtr cloneStmt() const override;
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a FINISH statement.
 class FinishStatement : public Statement {
 public:
     StmtPtr cloneStmt() const override { return std::make_unique<FinishStatement>(); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a RESULTIS statement.
@@ -361,6 +395,7 @@ public:
     explicit ResultisStatement(ExprPtr val) : value(std::move(val)) {}
     ExprPtr value;
     StmtPtr cloneStmt() const override { return std::make_unique<ResultisStatement>(value->cloneExpr()); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // --- Declaration Nodes ---
@@ -375,6 +410,7 @@ public:
     explicit GetDirective(std::string file) : filename(std::move(file)) {}
     std::string filename;
     DeclPtr cloneDecl() const override { return std::make_unique<GetDirective>(*this); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a LET declaration for variables.
@@ -393,6 +429,7 @@ public:
         }
         return std::make_unique<LetDeclaration>(std::move(new_inits));
     }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 class GlobalDeclaration : public Declaration {
@@ -404,6 +441,7 @@ public:
     explicit GlobalDeclaration(std::vector<Global> globals) : globals(std::move(globals)) {}
     std::vector<Global> globals;
     DeclPtr cloneDecl() const override { return std::make_unique<GlobalDeclaration>(*this); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 class ManifestDeclaration : public Declaration {
@@ -415,6 +453,7 @@ public:
     explicit ManifestDeclaration(std::vector<Manifest> manifests) : manifests(std::move(manifests)) {}
     std::vector<Manifest> manifests;
     DeclPtr cloneDecl() const override { return std::make_unique<ManifestDeclaration>(*this); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 // Represents a function or routine declaration.
@@ -428,6 +467,7 @@ public:
     ExprPtr body_expr; // For LET F() = E
     StmtPtr body_stmt; // For LET R() BE C
     DeclPtr cloneDecl() const override { return std::make_unique<FunctionDeclaration>(name, params, body_expr ? body_expr->cloneExpr() : nullptr, body_stmt ? body_stmt->cloneStmt() : nullptr); }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 
@@ -444,6 +484,7 @@ public:
         }
         return std::make_unique<Program>(std::move(new_decls));
     }
+    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
 #endif // AST_H

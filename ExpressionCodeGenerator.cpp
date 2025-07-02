@@ -190,31 +190,82 @@ void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
 }
 
 void ExpressionCodeGenerator::visitFunctionCall(const FunctionCall* node) {
-    throw std::runtime_error("ExpressionCodeGenerator::visitFunctionCall not implemented yet");
+    // Calculate the number of arguments that will be passed on the stack.
+    size_t num_stack_args = 0;
+    if (node->arguments.size() > 8) {
+        num_stack_args = node->arguments.size() - 8;
+    }
+
+    // Update maxOutgoingParamSpace based on actual stack arguments.
+    size_t currentCallParamBytes = num_stack_args * 8;
+    if (currentCallParamBytes > codeGen.maxOutgoingParamSpace) {
+        codeGen.maxOutgoingParamSpace = currentCallParamBytes;
+    }
+
+    codeGen.saveCallerSavedRegisters(); // Save caller-saved registers before argument evaluation.
+
+    // Allocate space for stack arguments if necessary.
+    if (num_stack_args > 0) {
+        codeGen.instructions.sub(codeGen.SP, codeGen.SP, currentCallParamBytes, "Allocate space for outgoing arguments");
+    }
+
+    // Evaluate arguments and place them in registers or on the stack.
+    // Evaluate in reverse order to avoid overwriting argument registers.
+    for (int i = node->arguments.size() - 1; i >= 0; --i) {
+        codeGen.visitExpression(node->arguments[i].get()); // Result is in X0
+
+        if (i < 8) { // First 8 arguments go into registers X0-X7
+            codeGen.instructions.mov(codeGen.X0 + i, codeGen.X0, "Move arg " + std::to_string(i) + " to X" + std::to_string(i));
+        } else { // Arguments beyond the 8th go onto the stack
+            // Stack arguments are pushed in order, so calculate offset from the beginning of the allocated block.
+            size_t stack_offset_index = i - 8;
+            codeGen.instructions.str(codeGen.X0, codeGen.SP, stack_offset_index * 8, "Store arg " + std::to_string(i) + " to stack");
+        }
+    }
+
+    // Generate call
+    if (auto funcVar = dynamic_cast<const VariableAccess*>(node->function.get())) {
+        // Direct function call
+        if (auto it = codeGen.functions.find(funcVar->name); it != codeGen.functions.end()) {
+            codeGen.instructions.bl(funcVar->name, "Call " + funcVar->name);
+        } else {
+            throw std::runtime_error("Unknown function: " + funcVar->name);
+        }
+    } else {
+        // Indirect function call through expression
+        codeGen.visitExpression(node->function.get());
+        codeGen.instructions.br(codeGen.X0);
+    }
+
+    // Deallocate stack arguments if necessary.
+    if (num_stack_args > 0) {
+        codeGen.instructions.add(codeGen.SP, codeGen.SP, currentCallParamBytes, "Deallocate outgoing arguments");
+    }
+
+    codeGen.restoreCallerSavedRegisters(); // Restore caller-saved registers after the call.
 }
 
 void ExpressionCodeGenerator::visitConditionalExpression(const ConditionalExpression* node) {
+    auto elseLabel = codeGen.labelManager.generateLabel("cond_else");
+    auto endLabel = codeGen.labelManager.generateLabel("cond_end");
+
     // Evaluate the condition
     codeGen.visitExpression(node->condition.get());
+    codeGen.instructions.cmp(codeGen.X0, 0);
+    codeGen.labelManager.requestLabelFixup(elseLabel, codeGen.instructions.getCurrentAddress());
+    codeGen.instructions.beq(elseLabel);
 
-    std::string elseLabel = codeGen.labelManager.generateLabel("cond_else");
-    std::string endLabel = codeGen.labelManager.generateLabel("cond_end");
-
-    // If X0 is 0 (false), branch to elseLabel
-    codeGen.instructions.cbz(codeGen.X0, elseLabel, "Branch to else if condition is false");
-
-    // Evaluate true expression
+    // If true, evaluate the 'then' expression
     codeGen.visitExpression(node->trueExpr.get());
-    codeGen.instructions.b(endLabel, "Jump to end after true expression");
+    codeGen.labelManager.requestLabelFixup(endLabel, codeGen.instructions.getCurrentAddress());
+    codeGen.instructions.b(endLabel);
 
-    // Else label
+    // If false, evaluate the 'else' expression
     codeGen.instructions.setPendingLabel(elseLabel);
     codeGen.labelManager.defineLabel(elseLabel, codeGen.instructions.getCurrentAddress());
-
-    // Evaluate false expression
     codeGen.visitExpression(node->falseExpr.get());
 
-    // End label
+    // Define the end label
     codeGen.instructions.setPendingLabel(endLabel);
     codeGen.labelManager.defineLabel(endLabel, codeGen.instructions.getCurrentAddress());
 }
@@ -224,17 +275,36 @@ void ExpressionCodeGenerator::visitValof(const Valof* node) {
 }
 
 void ExpressionCodeGenerator::visitTableConstructor(const TableConstructor* node) {
-    throw std::runtime_error("ExpressionCodeGenerator::visitTableConstructor not implemented yet");
+    throw std::runtime_error("Table constructors not yet implemented.");
 }
 
 void ExpressionCodeGenerator::visitVectorConstructor(const VectorConstructor* node) {
-    throw std::runtime_error("ExpressionCodeGenerator::visitVectorConstructor not implemented yet");
-}
-
-void ExpressionCodeGenerator::visitStringAccess(const StringAccess* node) {
-    throw std::runtime_error("ExpressionCodeGenerator::visitStringAccess not implemented yet");
+    codeGen.visitExpression(node->size.get());
+    // The size of the vector is now in X0.
+    // We need to call the `bcpl_vec` runtime function to allocate the vector.
+    codeGen.instructions.bl("bcpl_vec", "Allocate vector on heap");
+    // The result of the allocation (the pointer to the vector) is in X0.
 }
 
 void ExpressionCodeGenerator::visitCharacterAccess(const CharacterAccess* node) {
-    throw std::runtime_error("ExpressionCodeGenerator::visitCharacterAccess not implemented yet");
+    // Evaluate index first
+    codeGen.visitExpression(node->index.get());
+    // Save index
+    uint32_t indexReg = codeGen.scratchAllocator.acquire();
+    codeGen.instructions.mov(indexReg, codeGen.X0);
+
+    // Evaluate string address
+    codeGen.visitExpression(node->string.get());
+
+    // Calculate final address and load
+    codeGen.instructions.add(codeGen.X0, codeGen.X0, indexReg, AArch64Instructions::LSL, 2, "Calculate character address (4-byte chars)");
+    codeGen.instructions.ldr(codeGen.X0, codeGen.X0, 0, "Load character");
+    codeGen.scratchAllocator.release(indexReg);
+}
+
+void ExpressionCodeGenerator::visitStringAccess(const StringAccess* node) {
+    // This is typically handled by visitVariableAccess for string literals
+    // or by visitCharacterAccess for indexed access.
+    // If this is meant for something else, it needs further implementation.
+    throw std::runtime_error("ExpressionCodeGenerator::visitStringAccess not implemented for this context.");
 }

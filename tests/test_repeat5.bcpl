@@ -1,0 +1,22 @@
+GET "LIBHDR"
+
+LET START() BE $(
+    LET CMD = VEC 10 // A buffer for a command
+
+    // Outer infinite loop for the command prompt
+    $(
+        WRITES("> ")
+        LET LEN = RDLINE(CMD, 10)
+
+        IF LEN < 0 THEN BREAK // End on EOF
+
+        // Inner conventional loop to echo the command
+        LET I = 0
+        WHILE I < LEN DO $(
+            WRCH(CMD!I)
+            I := I + 1
+        $)
+        WRITES("*N")
+
+    $) REPEAT
+$)

@@ -1,0 +1,9 @@
+GET "LIBHDR"
+
+LET START() BE $(
+    LET I = 10
+    $(
+        WRITEF("%I3*N", I)
+        I := I - 1
+    $) REPEATUNTIL I = 0
+$)

@@ -1,0 +1,19 @@
+GET "LIBHDR"
+
+LET START() BE $(
+    LET I = 1
+    // Outer postfix loop
+    $(
+        LET J = 1
+        WRITEF("Outer loop, I=%I2*N", I)
+
+        // Inner postfix loop
+        $(
+            WRITEF("  Inner loop, J=%I2*N", J)
+            J := J + 1
+        $) REPEATWHILE J <= I
+
+        I := I + 1
+        WRITES("*N")
+    $) REPEATUNTIL I > 3
+$)

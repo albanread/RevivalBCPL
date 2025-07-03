@@ -1,0 +1,12 @@
+GET "LIBHDR"
+
+LET START() BE $(
+    // Outer loop for rows (i)
+    FOR I = 1 TO 10 DO $(
+        // Inner loop for columns (j)
+        FOR J = 1 TO 10 DO $(
+            WRITEF("%I4", I * J)
+        $)
+        WRITES("*N") // Newline after each row
+    $)
+$)

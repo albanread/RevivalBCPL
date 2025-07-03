@@ -1,0 +1,12 @@
+GET "LIBHDR"
+
+LET START() BE $(
+    LET CH = 0
+    $(
+        WRITES("Type a character (q to quit): ")
+        CH := RDCH()
+        WRITES("*N")
+        IF CH = 'q' THEN BREAK
+        WRITES("... still going ...*N")
+    $) REPEAT
+$)

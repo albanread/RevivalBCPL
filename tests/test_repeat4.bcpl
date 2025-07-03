@@ -1,0 +1,17 @@
+GET "LIBHDR"
+
+LET START() BE $(
+    FOR I = 1 TO 3 DO $(
+        LET J = 1
+        WRITES("Outer: ")
+        WRITEF("%I2*N", I)
+
+        // Inner postfix loop
+        $(
+            WRITEF("  Inner: %I2*N", J)
+            J := J + 1
+        $) REPEATUNTIL J > I
+
+        WRITES("*N") // Add a blank line for readability
+    $)
+$)

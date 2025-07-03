@@ -1,0 +1,8 @@
+GET "LIBHDR"
+
+LET START() BE
+$(  // Test dead code elimination
+    LET A = 10
+    LET B = 20 * 5 // B is dead code
+    WRITEN(A)
+$)

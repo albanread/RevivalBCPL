@@ -1,0 +1,14 @@
+GET "LIBHDR"
+
+LET START() BE $(
+    LET I = 1
+    WHILE I <= 10 DO $(
+        LET J = 1
+        WHILE J <= 10 DO $(
+            WRITEF("%I4", I * J)
+            J := J + 1
+        $)
+        WRITES("*N") // Newline after each row
+        I := I + 1
+    $)
+$)

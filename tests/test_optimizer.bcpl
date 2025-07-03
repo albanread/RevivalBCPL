@@ -1,0 +1,7 @@
+GET "LIBHDR"
+
+LET START() BE
+$(  // Test constant folding
+    LET A = 10 + 20 * 3 - 5
+    WRITEN(A)
+$)

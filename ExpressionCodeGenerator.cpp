@@ -84,10 +84,13 @@ void ExpressionCodeGenerator::visitUnaryOp(const UnaryOp* node) {
     }
 }
 
+
 void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
     // Evaluate LHS, result in X0
     codeGen.visitExpression(node->left.get());
-    uint32_t lhs_reg = codeGen.registerManager.acquireRegister("lhs_temp_reg_" + std::to_string(codeGen.instructions.getCurrentAddress()), 0); // Acquire a scratch register for LHS
+
+    // *** FIX: Use the scratch allocator for temporary values ***
+    uint32_t lhs_reg = codeGen.scratchAllocator.acquire();
 
     // Move LHS result from X0 to the acquired scratch register
     codeGen.instructions.mov(lhs_reg, codeGen.X0, "Save LHS result to scratch register");
@@ -98,9 +101,7 @@ void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
 
     switch (node->op) {
         case TokenType::OpPlus:
-            //codeGen.instructions.add(codeGen.X0, lhs_reg, rhs_reg, "Addition");
-            codeGen.instructions.add(codeGen.X0, lhs_reg, rhs_reg, AArch64Instructions::LSL, 0, "Addition");
-
+            codeGen.instructions.add(codeGen.X0, lhs_reg, rhs_reg, "Addition");
             break;
         case TokenType::OpMinus:
             codeGen.instructions.sub(codeGen.X0, lhs_reg, rhs_reg, "Subtraction");
@@ -109,19 +110,15 @@ void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
             codeGen.instructions.mul(codeGen.X0, lhs_reg, rhs_reg, "Multiplication");
             break;
         case TokenType::OpDivide:
-            // Integer division (signed)
             codeGen.instructions.sdiv(codeGen.X0, lhs_reg, rhs_reg, "Signed Division");
             break;
         case TokenType::OpRemainder:
-            // Integer remainder (signed)
-            // AArch64 doesn't have a direct REM instruction. It's usually implemented as:
-            // REM = LHS - (LHS / RHS) * RHS
-            { // Use a block to limit scope of temp_div_reg
-                uint32_t temp_div_reg = codeGen.registerManager.acquireRegister("rem_temp_reg_" + std::to_string(codeGen.instructions.getCurrentAddress()), 0);
-                codeGen.instructions.sdiv(temp_div_reg, lhs_reg, rhs_reg, "Temp for division in REM"); // temp_div_reg = LHS / RHS
-                codeGen.instructions.mul(temp_div_reg, temp_div_reg, rhs_reg, "Temp for (LHS/RHS)*RHS"); // temp_div_reg = (LHS/RHS)*RHS
-                codeGen.instructions.sub(codeGen.X0, lhs_reg, temp_div_reg, "Remainder"); // X0 = LHS - temp_div_reg
-                codeGen.registerManager.releaseRegister(temp_div_reg);
+            {
+                uint32_t temp_div_reg = codeGen.scratchAllocator.acquire();
+                codeGen.instructions.sdiv(temp_div_reg, lhs_reg, rhs_reg, "Temp for division in REM");
+                codeGen.instructions.mul(temp_div_reg, temp_div_reg, rhs_reg, "Temp for (LHS/RHS)*RHS");
+                codeGen.instructions.sub(codeGen.X0, lhs_reg, temp_div_reg, "Remainder");
+                codeGen.scratchAllocator.release(temp_div_reg);
             }
             break;
 
@@ -129,7 +126,7 @@ void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
         case TokenType::OpEq:
             codeGen.instructions.cmp(lhs_reg, rhs_reg, "Compare for equality");
             codeGen.instructions.cset(codeGen.X0, AArch64Instructions::EQ, "Set X0 if equal");
-            codeGen.instructions.neg(codeGen.X0, codeGen.X0, "Convert 1 to -1 for true"); // BCPL true is -1
+            codeGen.instructions.neg(codeGen.X0, codeGen.X0, "Convert 1 to -1 for true");
             break;
         case TokenType::OpNe:
             codeGen.instructions.cmp(lhs_reg, rhs_reg, "Compare for inequality");
@@ -165,33 +162,17 @@ void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
             codeGen.instructions.orr(codeGen.X0, lhs_reg, rhs_reg, "Bitwise OR");
             break;
         case TokenType::OpLshift:
-            //codeGen.instructions.lsl(codeGen.X0, lhs_reg, rhs_reg, "Logical Left Shift");
-            // Use LSLV to shift by the value in a register
-            codeGen.instructions.lslv(codeGen.X0, lhs_reg, rhs_reg, "Logical Left Shift (Variable)");
-
+            codeGen.instructions.lslv(codeGen.X0, lhs_reg, rhs_reg, "Logical Left Shift by register");
             break;
         case TokenType::OpRshift:
-            codeGen.instructions.lsr(codeGen.X0, lhs_reg, rhs_reg, "Logical Right Shift");
+            codeGen.instructions.lsrv(codeGen.X0, lhs_reg, rhs_reg, "Logical Right Shift by register");
             break;
-
-        // Floating point operations (need to use floating point registers and instructions)
-        case TokenType::OpFloatPlus:
-        case TokenType::OpFloatMinus:
-        case TokenType::OpFloatMultiply:
-        case TokenType::OpFloatDivide:
-        case TokenType::OpFloatEq:
-        case TokenType::OpFloatNe:
-        case TokenType::OpFloatLt:
-        case TokenType::OpFloatGt:
-        case TokenType::OpFloatLe:
-        case TokenType::OpFloatGe:
-            throw std::runtime_error("Floating point binary operations not implemented yet.");
 
         default:
             throw std::runtime_error("Unsupported binary operator: " + Token::tokenTypeToString(node->op));
     }
 
-    codeGen.registerManager.releaseRegister(lhs_reg);
+    codeGen.scratchAllocator.release(lhs_reg);
 }
 
 void ExpressionCodeGenerator::visitFunctionCall(const FunctionCall* node) {

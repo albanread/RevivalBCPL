@@ -1,12 +1,10 @@
 #include "Parser.h"
-#include "VectorAllocationVisitor.h"
 #include <stdexcept>
 #include <map>
 #include <iostream>
 #include <string>
 
 // Map to determine the precedence of binary operators.
-// Higher numbers mean higher precedence.
 static const std::map<TokenType, int> PrecedenceMap = {
     {TokenType::OpLogOr, 1}, {TokenType::OpLogNeqv, 1}, {TokenType::OpLogEqv, 1},
     {TokenType::OpLogAnd, 2},
@@ -38,16 +36,13 @@ int Parser::getTokenPrecedence() {
 
 ProgramPtr Parser::parse(const std::string& source) {
     lexer.init(source);
-    advanceTokens(); // Load first token
-    advanceTokens(); // Load peek token
+    advanceTokens();
+    advanceTokens();
 
     std::vector<DeclPtr> declarations;
     while (currentToken.type != TokenType::Eof) {
-        if (currentToken.type == TokenType::KwLet || currentToken.type == TokenType::KwGlobal || currentToken.type == TokenType::KwManifest) {
-            declarations.push_back(parseDeclaration());
-        } else {
-            throw std::runtime_error("Parser Error: Expected top-level declaration or statement.");
-        }
+        // Top-level must be declarations in BCPL
+        declarations.push_back(parseDeclaration());
     }
 
     return std::make_unique<Program>(std::move(declarations));
@@ -119,6 +114,7 @@ DeclPtr Parser::parseGlobalDeclaration() {
         int size = currentToken.int_val;
         expect(TokenType::IntegerLiteral, "Expected integer literal for size in global declaration");
         globals.push_back({name, size});
+        if (currentToken.type == TokenType::Semicolon) advanceTokens();
     }
     expect(TokenType::RSection, "Expected '$)' after global declarations");
     return std::make_unique<GlobalDeclaration>(std::move(globals));
@@ -181,21 +177,45 @@ DeclPtr Parser::parseFunctionOrRoutineDeclaration(const std::string& name) {
 
 // --- Statement Parsing ---
 
-StmtPtr Parser::parseTestStatement() {
-    expect(TokenType::KwTest, "Expected 'TEST'");
-    ExprPtr condition = parseExpression();
-    expect(TokenType::KwThen, "Expected 'THEN' after condition.");
-    StmtPtr then_stmt = parseStatement();
-    StmtPtr else_stmt = nullptr;
-    if (currentToken.type == TokenType::KwOr) {
-        advanceTokens();
-        else_stmt = parseStatement();
+// The new main entry point for parsing any statement.
+// It implements the "Parse-and-Check" strategy for postfix loops.
+StmtPtr Parser::parseStatement() {
+    // Step 1: Parse a simple statement first. This is the potential loop body 'C'.
+    StmtPtr body = parseSimpleStatement();
+
+    // Step 2: Check if the statement is followed by a REPEAT modifier.
+    // This version checks for combined tokens like REPEATWHILE.
+    switch (currentToken.type) {
+        case TokenType::KwRepeat:
+            // Case: C REPEAT (infinite loop)
+            advanceTokens(); // Consume 'REPEAT'
+            return std::make_unique<RepeatStatement>(std::move(body), nullptr, RepeatStatement::LoopType::repeat);
+
+        case TokenType::KwRepeatWhile:
+            // Case: C REPEATWHILE E
+            advanceTokens(); // Consume 'REPEATWHILE'
+            {
+                ExprPtr condition = parseExpression();
+                return std::make_unique<RepeatStatement>(std::move(body), std::move(condition), RepeatStatement::LoopType::repeatwhile);
+            }
+
+        case TokenType::KwRepeatUntil:
+            // Case: C REPEATUNTIL E
+            advanceTokens(); // Consume 'REPEATUNTIL'
+            {
+                ExprPtr condition = parseExpression();
+                return std::make_unique<RepeatStatement>(std::move(body), std::move(condition), RepeatStatement::LoopType::repeatuntil);
+            }
+
+        default:
+            // Not a repeat loop, so just return the simple statement we parsed.
+            return body;
     }
-    return std::make_unique<TestStatement>(std::move(condition), std::move(then_stmt), std::move(else_stmt));
 }
 
-StmtPtr Parser::parseStatement() {
-    std::cout << "parseStatement: " << currentToken.text << std::endl;
+
+// This function parses any statement that is NOT a postfix-repeat loop.
+StmtPtr Parser::parseSimpleStatement() {
     switch (currentToken.type) {
         case TokenType::KwLet:
             return std::make_unique<DeclarationStatement>(parseLetDeclaration());
@@ -216,8 +236,6 @@ StmtPtr Parser::parseStatement() {
         case TokenType::KwReturn:
             advanceTokens();
             return std::make_unique<ReturnStatement>();
-        case TokenType::KwRepeat:
-            return parseRepeatStatement();
         case TokenType::KwLoop:
             advanceTokens();
             return std::make_unique<LoopStatement>();
@@ -248,6 +266,7 @@ StmtPtr Parser::parseStatement() {
             return parseExpressionStatement();
     }
 }
+
 
 StmtPtr Parser::parseCompoundStatement() {
     expect(currentToken.type == TokenType::LSection || currentToken.type == TokenType::LBrace ? currentToken.type : TokenType::LSection, "Expected '$(' or '{' to start a block.");
@@ -292,14 +311,6 @@ StmtPtr Parser::parseWhileStatement() {
     return std::make_unique<WhileStatement>(std::move(condition), std::move(body));
 }
 
-StmtPtr Parser::parseRepeatStatement() {
-    expect(TokenType::KwRepeat, "Expected 'REPEAT'");
-    StmtPtr body = parseStatement();
-    expect(TokenType::KwUntil, "Expected 'UNTIL' after REPEAT body.");
-    ExprPtr condition = parseExpression();
-    return std::make_unique<RepeatStatement>(std::move(body), std::move(condition));
-}
-
 StmtPtr Parser::parseForStatement() {
     expect(TokenType::KwFor, "Expected 'FOR'");
     std::string var_name = currentToken.text;
@@ -317,6 +328,19 @@ StmtPtr Parser::parseForStatement() {
     StmtPtr body = parseStatement();
 
     return std::make_unique<ForStatement>(var_name, std::move(from_expr), std::move(to_expr), std::move(by_expr), std::move(body));
+}
+
+StmtPtr Parser::parseTestStatement() {
+    expect(TokenType::KwTest, "Expected 'TEST'");
+    ExprPtr condition = parseExpression();
+    expect(TokenType::KwThen, "Expected 'THEN' after condition.");
+    StmtPtr then_stmt = parseStatement();
+    StmtPtr else_stmt = nullptr;
+    if (currentToken.type == TokenType::KwOr) {
+        advanceTokens();
+        else_stmt = parseStatement();
+    }
+    return std::make_unique<TestStatement>(std::move(condition), std::move(then_stmt), std::move(else_stmt));
 }
 
 StmtPtr Parser::parseGotoStatement() {
@@ -365,22 +389,23 @@ StmtPtr Parser::parseResultisStatement() {
 }
 
 StmtPtr Parser::parseExpressionStatement() {
-    std::cout << "parseExpressionStatement: " << currentToken.text << std::endl;
-    ExprPtr expr = parsePrimaryExpression();
-    expr = parseExpression(0, std::move(expr));
+    ExprPtr expr = parseExpression();
 
     if (auto* call = dynamic_cast<FunctionCall*>(expr.get())) {
+        // If it's a function call and not part of an assignment, it's a routine call.
         if (currentToken.type != TokenType::OpAssign) {
              return std::make_unique<RoutineCall>(std::move(expr));
         }
     }
 
+    // Must be an assignment
     if(currentToken.type == TokenType::OpAssign || currentToken.type == TokenType::Comma) {
         std::vector<ExprPtr> lhs_list;
         lhs_list.push_back(std::move(expr));
 
         while(currentToken.type == TokenType::Comma) {
             advanceTokens();
+            // In a multi-assignment, the LHS can only be simple names/accesses
             lhs_list.push_back(parsePrimaryExpression());
         }
 
@@ -402,15 +427,10 @@ StmtPtr Parser::parseExpressionStatement() {
 // --- Expression Parsing (Precedence Climbing) ---
 
 ExprPtr Parser::parseExpression(int precedence) {
-    std::cout << "parseExpression: " << currentToken.text << std::endl;
     ExprPtr lhs = parsePrimaryExpression();
-    return parseExpression(precedence, std::move(lhs));
-}
-
-ExprPtr Parser::parseExpression(int precedence, ExprPtr lhs) {
-    std::cout << "parseExpression (with lhs): " << currentToken.text << std::endl;
 
     while (true) {
+        // Handle conditional expression separately as it's right-associative and has special syntax
         if (currentToken.type == TokenType::OpConditional) {
             advanceTokens();
             ExprPtr true_expr = parseExpression();
@@ -428,16 +448,13 @@ ExprPtr Parser::parseExpression(int precedence, ExprPtr lhs) {
         TokenType op = currentToken.type;
         advanceTokens();
 
-        if (op == TokenType::OpBang) {
+        if (op == TokenType::OpBang) { // Vector access V!E
             ExprPtr rhs = parseExpression(prec + 1);
             lhs = std::make_unique<VectorAccess>(std::move(lhs), std::move(rhs));
-        } else if (op == TokenType::OpCharSub) {
+        } else if (op == TokenType::OpCharSub) { // Character access S%E
             ExprPtr rhs = parseExpression(prec + 1);
             lhs = std::make_unique<CharacterAccess>(std::move(lhs), std::move(rhs));
-        } else if (op == TokenType::OpFloatVecSub) {
-            ExprPtr rhs = parseExpression(prec + 1);
-            lhs = std::make_unique<BinaryOp>(op, std::move(lhs), std::move(rhs));
-        } else {
+        } else { // Other binary operators
             ExprPtr rhs = parseExpression(prec + 1);
             lhs = std::make_unique<BinaryOp>(op, std::move(lhs), std::move(rhs));
         }
@@ -446,13 +463,10 @@ ExprPtr Parser::parseExpression(int precedence, ExprPtr lhs) {
 }
 
 ExprPtr Parser::parsePrimaryExpression() {
-    std::cout << "parsePrimaryExpression: " << currentToken.text << std::endl;
     ExprPtr expr;
-
     if (currentToken.type == TokenType::OpAt || currentToken.type == TokenType::OpLogNot || currentToken.type == TokenType::OpMinus) {
         expr = parseUnary();
-    }
-    else {
+    } else {
         switch (currentToken.type) {
             case TokenType::Identifier:
                 expr = parseIdentifierExpression();
@@ -495,6 +509,8 @@ ExprPtr Parser::parsePrimaryExpression() {
         }
     }
 
+    // After parsing a primary expression, check if it's a function call.
+    // This handles cases like (f(x))(y)
     while (currentToken.type == TokenType::LParen) {
         expr = parseFunctionCall(std::move(expr));
     }
@@ -505,6 +521,7 @@ ExprPtr Parser::parsePrimaryExpression() {
 ExprPtr Parser::parseUnary() {
     TokenType op = currentToken.type;
     advanceTokens();
+    // Use a high precedence (e.g., 7) for the operand of a unary operator.
     ExprPtr rhs = parseExpression(7);
     return std::make_unique<UnaryOp>(op, std::move(rhs));
 }
@@ -522,7 +539,7 @@ ExprPtr Parser::parseParenExpression() {
     return expr;
 }
 
-ExprPtr Parser::parseFunctionCall(ExprPtr function_name) {
+ExprPtr Parser::parseFunctionCall(ExprPtr function_expr) {
     expect(TokenType::LParen, "Expected '(' for function call.");
     std::vector<ExprPtr> args;
     if (currentToken.type != TokenType::RParen) {
@@ -533,7 +550,7 @@ ExprPtr Parser::parseFunctionCall(ExprPtr function_name) {
         }
     }
     expect(TokenType::RParen, "Expected ')' after arguments.");
-    return std::make_unique<FunctionCall>(std::move(function_name), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(function_expr), std::move(args));
 }
 
 ExprPtr Parser::parseValofExpression() {

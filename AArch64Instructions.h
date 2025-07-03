@@ -100,6 +100,7 @@ public:
     void sdiv(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment = "");
     void lsl(uint32_t rd, uint32_t rn, uint32_t imm, const std::string& comment = "");
     void lslv(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment);
+    void lsrv(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment);
     void lsr(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment = "");
     void msub(uint32_t rd, uint32_t rn, uint32_t rm, uint32_t ra, const std::string& comment = "");
     void stp(uint32_t rt1, uint32_t rt2, uint32_t rn, int32_t imm, const std::string& comment = "");

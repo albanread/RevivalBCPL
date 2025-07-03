@@ -594,22 +594,51 @@ void StatementCodeGenerator::visitLoopStatement(const LoopStatement* node) {
 void StatementCodeGenerator::visitRepeatStatement(const RepeatStatement* node) {
     codeGen.labelManager.pushScope(LabelManager::ScopeType::LOOP);
     auto startLabel = codeGen.labelManager.getCurrentRepeatLabel();
-    auto endLabel = codeGen.labelManager.getCurrentEndLabel(); // Added for correct UNTIL logic
+    auto endLabel = codeGen.labelManager.getCurrentEndLabel();
 
+    // Define the start label for the loop
     codeGen.instructions.setPendingLabel(startLabel);
     codeGen.labelManager.defineLabel(startLabel, codeGen.instructions.getCurrentAddress());
-    codeGen.visitStatement(node->body.get());
-    codeGen.visitExpression(node->condition.get());
-    // REPEAT UNTIL E means loop while E is FALSE. So, branch to start if E is 0 (false).
-    codeGen.labelManager.requestLabelFixup(startLabel, codeGen.instructions.getCurrentAddress());
-    codeGen.instructions.beq(startLabel); // Fixed: Branch if E is 0 (false) to repeat
 
-    // Define the end label for BREAK statements or when condition is true
+    // Generate code for the loop body
+    codeGen.visitStatement(node->body.get());
+
+    // Switch on the loop type to generate the correct conditional branch
+    switch (node->loopType) {
+        case RepeatStatement::LoopType::repeat:
+            // Infinite loop: C REPEAT
+            // Unconditionally branch back to the start.
+            codeGen.instructions.b(startLabel, "Infinite repeat loop");
+            break;
+
+        case RepeatStatement::LoopType::repeatwhile:
+            // Loop while true: C REPEATWHILE E
+            // The loop continues if the condition is TRUE (-1).
+            // So, we branch to the start if the condition is NOT FALSE (0).
+            assert(node->condition && "REPEATWHILE must have a condition");
+            codeGen.visitExpression(node->condition.get()); // Result in X0
+            codeGen.instructions.cmp(codeGen.X0, 0); // Compare with 0 (FALSE)
+            codeGen.instructions.bne(startLabel, "Branch if true (not zero)"); // Branch if not equal to 0
+            break;
+
+        case RepeatStatement::LoopType::repeatuntil:
+            // Loop until true: C REPEATUNTIL E
+            // The loop continues if the condition is FALSE (0).
+            // So, we branch to the start if the condition is FALSE (0).
+            assert(node->condition && "REPEATUNTIL must have a condition");
+            codeGen.visitExpression(node->condition.get()); // Result in X0
+            codeGen.instructions.cmp(codeGen.X0, 0); // Compare with 0 (FALSE)
+            codeGen.instructions.beq(startLabel, "Branch if false (zero)"); // Branch if equal to 0
+            break;
+    }
+
+    // Define the end label for BREAK statements
     codeGen.instructions.setPendingLabel(endLabel);
     codeGen.labelManager.defineLabel(endLabel, codeGen.instructions.getCurrentAddress());
 
     codeGen.labelManager.popScope();
 }
+
 
 void StatementCodeGenerator::visitEndcaseStatement(const EndcaseStatement* node) {
     // TODO: Move implementation from CodeGenerator.cpp

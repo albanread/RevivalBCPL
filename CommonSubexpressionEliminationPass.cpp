@@ -275,8 +275,12 @@ StmtPtr CommonSubexpressionEliminationPass::visit(ResultisStatement* node) {
 
 StmtPtr CommonSubexpressionEliminationPass::visit(RepeatStatement* node) {
     auto new_body = visit(node->body.get());
-    auto new_cond = visit(node->condition.get());
-    return std::make_unique<RepeatStatement>(std::move(new_body), std::move(new_cond));
+    auto new_cond = node->condition ? visit(node->condition.get()) : nullptr;
+    return std::make_unique<RepeatStatement>(
+        std::move(new_body),
+        std::move(new_cond),
+        node->loopType  // Pass through the original loop type
+    );
 }
 
 StmtPtr CommonSubexpressionEliminationPass::visit(SwitchonStatement* node) {

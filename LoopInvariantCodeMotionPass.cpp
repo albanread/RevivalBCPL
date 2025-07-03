@@ -195,7 +195,11 @@ StmtPtr LoopInvariantCodeMotionPass::visit(WhileStatement* node) {
 }
 
 StmtPtr LoopInvariantCodeMotionPass::visit(RepeatStatement* node) {
-    return std::make_unique<RepeatStatement>(visit(node->body.get()), visit(node->condition.get()));
+    return std::make_unique<RepeatStatement>(
+        visit(node->body.get()),
+        node->condition ? visit(node->condition.get()) : nullptr,
+        node->loopType  // Pass through the original loop type
+    );
 }
 
 StmtPtr LoopInvariantCodeMotionPass::visit(ForStatement* node) {

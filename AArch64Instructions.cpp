@@ -128,6 +128,15 @@ void AArch64Instructions::lslv(uint32_t rd, uint32_t rn, uint32_t rm, const std:
     addInstruction({encoding, "lslv " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment});
 }
 
+void  AArch64Instructions::lsrv(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment)
+{
+    // This function generates the LSRV instruction: rd = rn >> rm
+    // The base encoding for 64-bit LSRV Xd, Xn, Xm is 0x9AC02400
+    uint32_t encoding = 0x9AC02400 | (rm << 16) | (rn << 5) | rd;
+    addInstruction({encoding, "lsrv " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment});
+}
+
+
 void AArch64Instructions::lsr(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
     uint32_t encoding = 0x1AC02800 | (rd & 0x1F) | ((rn & 0x1F) << 5) | ((rm & 0x1F) << 16);
     addInstruction({encoding, "lsr " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment});

@@ -41,6 +41,9 @@ private:
     Lexer& lexer;
     Token currentToken;
     Token peekToken;
+    StmtPtr lastStatement; // Buffer for the most recently parsed statement
+
+
 
     // --- Utility Methods ---
     void advanceTokens();
@@ -57,6 +60,7 @@ private:
     // Other declarations like MANIFEST, STATIC, GLOBAL would go here.
 
     // Statements
+    StmtPtr parseSimpleStatement();
     StmtPtr parseStatement();
     StmtPtr parseCompoundStatement();
     StmtPtr parseTestStatement();

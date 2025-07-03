@@ -14,11 +14,11 @@ std::string RepeatUntilOptimizationPass::getName() const {
 }
 
 // --- Key Optimization Logic ---
-
+// Fix for RepeatUntilOptimizationPass.cpp
 StmtPtr RepeatUntilOptimizationPass::visit(RepeatStatement* node) {
     // First, optimize the body and condition expressions themselves.
     auto new_body = visit(node->body.get());
-    auto new_cond = visit(node->condition.get());
+    auto new_cond = node->condition ? visit(node->condition.get()) : nullptr;
 
     // Check if the optimized condition is a constant.
     if (auto* cond_lit = dynamic_cast<NumberLiteral*>(new_cond.get())) {
@@ -36,9 +36,12 @@ StmtPtr RepeatUntilOptimizationPass::visit(RepeatStatement* node) {
     }
 
     // If the condition is not a constant, just return the optimized loop.
-    return std::make_unique<RepeatStatement>(std::move(new_body), std::move(new_cond));
+    return std::make_unique<RepeatStatement>(
+        std::move(new_body),
+        std::move(new_cond),
+        node->loopType  // Pass through the original loop type
+    );
 }
-
 
 // --- Boilerplate Visitor Implementation (Pass-through) ---
 

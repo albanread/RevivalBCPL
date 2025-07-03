@@ -277,8 +277,13 @@ StmtPtr ConstantFoldingPass::visit(WhileStatement* node) {
     return std::make_unique<WhileStatement>(std::move(new_cond), std::move(new_body));
 }
 
+
 StmtPtr ConstantFoldingPass::visit(RepeatStatement* node) {
-    return std::make_unique<RepeatStatement>(visit(node->body.get()), visit(node->condition.get()));
+    return std::make_unique<RepeatStatement>(
+        visit(node->body.get()),
+        node->condition ? visit(node->condition.get()) : nullptr,
+        node->loopType
+    );
 }
 
 StmtPtr ConstantFoldingPass::visit(ForStatement* node) {

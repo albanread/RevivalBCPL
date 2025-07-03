@@ -12,6 +12,8 @@ class Expression;
 class Statement;
 class Declaration;
 class Program;
+class RepeatStatement;
+
 
 // --- Smart Pointer Type Definitions ---
 using ExprPtr = std::unique_ptr<Expression>;
@@ -140,6 +142,31 @@ public:
     std::unique_ptr<Node> clone() const override { return cloneStmt(); }
 };
 
+class RepeatStatement : public Statement {
+public:
+    enum class LoopType { repeat, repeatwhile, repeatuntil };
+
+    std::unique_ptr<Statement> body;
+    std::unique_ptr<Expression> condition;
+    LoopType loopType;
+
+    RepeatStatement(StmtPtr body)
+        : body(std::move(body)) {}
+
+
+    RepeatStatement(std::unique_ptr<Statement> body, std::unique_ptr<Expression> condition, LoopType loopType)
+        : body(std::move(body)), condition(std::move(condition)), loopType(loopType) {}
+
+    void accept(ASTVisitor* visitor) override;
+
+    // This override was incorrect and has been removed.
+    // The base class `Statement::clone()` is sufficient.
+
+    // Correctly override the `cloneStmt` function from the `Statement` base class.
+    std::unique_ptr<Statement> cloneStmt() const override;
+};
+
+
 // --- New Statement Node Definitions ---
 // Represents a SWITCHON statement.
 class SwitchonStatement : public Statement {
@@ -178,16 +205,6 @@ public:
     void accept(ASTVisitor* visitor) override { visitor->visit(this); }
 };
 
-// Represents a REPEAT UNTIL loop.
-class RepeatStatement : public Statement {
-public:
-    RepeatStatement(StmtPtr body, ExprPtr cond)
-        : body(std::move(body)), condition(std::move(cond)) {}
-    StmtPtr body;
-    ExprPtr condition;
-    StmtPtr cloneStmt() const override { return std::make_unique<RepeatStatement>(body->cloneStmt(), condition->cloneExpr()); }
-    void accept(ASTVisitor* visitor) override { visitor->visit(this); }
-};
 
 // Represents an ENDCASE statement.
 class EndcaseStatement : public Statement {

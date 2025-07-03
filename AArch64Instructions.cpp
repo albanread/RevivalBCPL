@@ -82,10 +82,29 @@ void AArch64Instructions::add(uint32_t rd, uint32_t rn, uint32_t imm, const std:
     addInstruction({encoding, "add " + regName(rd) + ", " + regName(rn) + ", #" + std::to_string(imm), comment, false, "", getCurrentAddress()});
 }
 
+
+
 void AArch64Instructions::sub(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
     uint32_t encoding = 0xCB000000 | (rm << 16) | (rn << 5) | rd;
     addInstruction({encoding, "sub " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment, false, "", getCurrentAddress()});
 }
+
+// Add this new function for subtracting an immediate value
+void AArch64Instructions::sub_imm(uint32_t rd, uint32_t rn, uint32_t imm, const std::string& comment) {
+    // SUB rd, rn, #imm
+    // Base encoding for 64-bit SUB (immediate) is 0xD1000000
+    uint32_t encoding = 0xD1000000 | (imm << 10) | (rn << 5) | rd;
+    addInstruction({encoding, "sub " + regName(rd) + ", " + regName(rn) + ", #" + std::to_string(imm), comment});
+}
+
+// Rename your existing register-based sub function to this
+void AArch64Instructions::sub_reg(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
+    // SUB rd, rn, rm
+    // Base encoding for 64-bit SUB (register) is 0xCB000000
+    uint32_t encoding = 0xCB000000 | (rm << 16) | (rn << 5) | rd;
+    addInstruction({encoding, "sub " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment});
+}
+
 
 void AArch64Instructions::mul(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
     uint32_t encoding = 0x9B007C00 | (rm << 16) | (rn << 5) | rd;
@@ -100,6 +119,13 @@ void AArch64Instructions::lsl(uint32_t rd, uint32_t rn, uint32_t imm, const std:
     // This is a simplified version that uses UBFM for LSL
     uint32_t encoding = 0x53000000 | (1 << 22) | (rd & 0x1F) | ((rn & 0x1F) << 5) | ((imm & 0x3F) << 16) | ((63 - imm) << 10);
     addInstruction({encoding, "lsl " + regName(rd) + ", " + regName(rn) + ", #" + std::to_string(imm), comment});
+}
+
+void AArch64Instructions::lslv(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
+    // This function generates the LSLV instruction: rd = rn << rm
+    // The base encoding for 64-bit LSLV Xd, Xn, Xm is 0x9AC02000
+    uint32_t encoding = 0x9AC02000 | (rm << 16) | (rn << 5) | rd;
+    addInstruction({encoding, "lslv " + regName(rd) + ", " + regName(rn) + ", " + regName(rm), comment});
 }
 
 void AArch64Instructions::lsr(uint32_t rd, uint32_t rn, uint32_t rm, const std::string& comment) {
@@ -325,7 +351,7 @@ void AArch64Instructions::resolveAllBranches() {
             labelMap[instr.label] = instr.address;
         }
     }
-    
+
     // Resolve branch targets
     for (auto& instr : instructions) {
         if (instr.needsLabelResolution) {
@@ -333,10 +359,10 @@ void AArch64Instructions::resolveAllBranches() {
             if (it != labelMap.end()) {
                 size_t targetAddress = it->second;
                 int64_t offset = static_cast<int64_t>(targetAddress) - static_cast<int64_t>(instr.address);
-                
+
                 // Update the instruction encoding based on instruction type
                 uint32_t opcode = instr.encoding & 0xFC000000; // Extract opcode bits
-                
+
                 if (opcode == 0x14000000) { // B instruction
                     instr.encoding |= ((offset / 4) & 0x03FFFFFF);
                 } else if ((opcode & 0xFE000000) == 0x54000000) { // Conditional branch (B.cond)
@@ -346,7 +372,7 @@ void AArch64Instructions::resolveAllBranches() {
                 } else if ((opcode & 0xFF000000) == 0x34000000) { // CBZ/CBNZ
                     instr.encoding |= (((offset / 4) & 0x0007FFFF) << 5);
                 }
-                
+
                 instr.needsLabelResolution = false;
             }
         }
@@ -357,13 +383,13 @@ size_t AArch64Instructions::encodeToBuffer(uint8_t* buffer, size_t bufferSize) c
     if (bufferSize < instructions.size() * 4) {
         throw std::runtime_error("Buffer too small for instruction encoding");
     }
-    
+
     size_t bytesWritten = 0;
     for (const auto& instr : instructions) {
         instr.encode(buffer + bytesWritten);
         bytesWritten += 4;
     }
-    
+
     return bytesWritten;
 }
 

@@ -44,6 +44,7 @@ public:
     void visit(RepeatStatement* node) override;
     void visit(SwitchonStatement* node) override;
     void visit(GotoStatement* node) override;
+    void visit(DeclarationStatement* node) override; // Added for DeclarationStatement
 
 private:
     std::set<std::string> usedVariables;

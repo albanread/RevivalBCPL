@@ -34,6 +34,7 @@ public:
     void visitVectorConstructor(const VectorConstructor* node);
     void visitStringAccess(const StringAccess* node);
     void visitCharacterAccess(const CharacterAccess* node);
+    void visitVectorAccess(const VectorAccess* node);
 
 private:
     CodeGenerator& codeGen;

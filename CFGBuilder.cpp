@@ -2,196 +2,216 @@
 #include <iostream>
 
 BasicBlock::Ptr CFGBuilder::createNewBlock() {
-    return std::make_shared<BasicBlock>(nextBlockId++);
+    BasicBlock::Ptr newBlock = std::make_shared<BasicBlock>(nextBlockId++);
+    std::cout << "CFGBuilder: Created new block " << newBlock->toString() << "\n";
+    return newBlock;
 }
 
-std::map<std::string, BasicBlock::Ptr> CFGBuilder::build(ProgramPtr&& program) {
+void CFGBuilder::build(const ProgramPtr& program) {
     functionEntryBlocks.clear();
     nextBlockId = 0;
 
-    for (auto& decl : program->declarations) { // Iterate by reference to allow moving out of unique_ptr
+    std::cout << "CFGBuilder: Starting CFG construction...\n";
+
+    for (auto& decl : program->declarations) { 
         if (auto funcDecl = dynamic_cast<FunctionDeclaration*>(decl.get())) {
+            std::cout << "CFGBuilder: Processing function: " << funcDecl->name << "\n";
             // Create an entry block for each function
             BasicBlock::Ptr entryBlock = createNewBlock();
             functionEntryBlocks[funcDecl->name] = entryBlock;
 
             // Build CFG for the function body
             if (funcDecl->body_stmt) {
-                // We need to release the unique_ptr from funcDecl and pass it to buildCFGForStatement
-                buildCFGForStatement(std::move(funcDecl->body_stmt), entryBlock);
+                std::cout << "CFGBuilder: Building CFG for function body...\n";
+                // Pass raw pointer to buildCFGForStatement
+                buildCFGForStatement(funcDecl->body_stmt.get(), entryBlock);
             } 
-            // else if (funcDecl->body_expr) {
-            //     // For now, expressions as function bodies are treated as single statements
-            //     // This might need refinement depending on how complex expressions are handled.
-            //     entryBlock->addStatement(std::move(funcDecl->body_expr)); // Type mismatch: ExprPtr to StmtPtr
-            // }
         }
-        // TODO: Handle other top-level declarations if they contain executable code
     }
-    return functionEntryBlocks;
+    std::cout << "CFGBuilder: CFG construction complete.\n";
 }
 
-BasicBlock::Ptr CFGBuilder::addStatementToBlock(std::unique_ptr<Statement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::addStatementToBlock(Statement* stmt, BasicBlock::Ptr currentBlock) {
     if (!currentBlock) {
         currentBlock = createNewBlock();
     }
-    currentBlock->addStatement(std::move(stmt));
+    // std::cout << "CFGBuilder: Adding statement to " << currentBlock->toString() << ": " << stmt->toString() << "\n"; // Removed: Statement does not have toString()
+    currentBlock->addStatement(stmt);
     return currentBlock;
 }
 
-BasicBlock::Ptr CFGBuilder::buildCFGForStatement(std::unique_ptr<Statement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::buildCFGForStatement(Statement* stmt, BasicBlock::Ptr currentBlock) {
     if (!stmt) return currentBlock;
 
+    // std::cout << "CFGBuilder: Handling statement type: " << stmt->toString() << "\n"; // Removed: Statement does not have toString()
+
     // Handle different statement types
-    if (CompoundStatement* compound = dynamic_cast<CompoundStatement*>(stmt.get())) {
-        return handleCompoundStatement(std::unique_ptr<CompoundStatement>(static_cast<CompoundStatement*>(stmt.release())), currentBlock);
-    } else if (IfStatement* ifStmt = dynamic_cast<IfStatement*>(stmt.get())) {
-        return handleIfStatement(std::unique_ptr<IfStatement>(static_cast<IfStatement*>(stmt.release())), currentBlock);
-    } else if (WhileStatement* whileStmt = dynamic_cast<WhileStatement*>(stmt.get())) {
-        return handleWhileStatement(std::unique_ptr<WhileStatement>(static_cast<WhileStatement*>(stmt.release())), currentBlock);
-    } else if (ForStatement* forStmt = dynamic_cast<ForStatement*>(stmt.get())) {
-        return handleForStatement(std::unique_ptr<ForStatement>(static_cast<ForStatement*>(stmt.release())), currentBlock);
-    } else if (RoutineCall* routineCall = dynamic_cast<RoutineCall*>(stmt.get())) {
-        return handleRoutineCall(std::unique_ptr<RoutineCall>(static_cast<RoutineCall*>(stmt.release())), currentBlock);
-    } else if (ReturnStatement* ret = dynamic_cast<ReturnStatement*>(stmt.get())) {
-        return handleReturnStatement(std::unique_ptr<ReturnStatement>(static_cast<ReturnStatement*>(stmt.release())), currentBlock);
-    } else if (LoopStatement* loop = dynamic_cast<LoopStatement*>(stmt.get())) {
-        return handleLoopStatement(std::unique_ptr<LoopStatement>(static_cast<LoopStatement*>(stmt.release())), currentBlock);
-    } else if (RepeatStatement* repeat = dynamic_cast<RepeatStatement*>(stmt.get())) {
-        return handleRepeatStatement(std::unique_ptr<RepeatStatement>(static_cast<RepeatStatement*>(stmt.release())), currentBlock);
-    } else if (SwitchonStatement* switchon = dynamic_cast<SwitchonStatement*>(stmt.get())) {
-        return handleSwitchonStatement(std::unique_ptr<SwitchonStatement>(static_cast<SwitchonStatement*>(stmt.release())), currentBlock);
-    } else if (GotoStatement* gotoStmt = dynamic_cast<GotoStatement*>(stmt.get())) {
-        return handleGotoStatement(std::unique_ptr<GotoStatement>(static_cast<GotoStatement*>(stmt.release())), currentBlock);
-    } else if (LabeledStatement* labeledStmt = dynamic_cast<LabeledStatement*>(stmt.get())) {
-        return handleLabeledStatement(std::unique_ptr<LabeledStatement>(static_cast<LabeledStatement*>(stmt.release())), currentBlock);
-    } else if (DeclarationStatement* declStmt = dynamic_cast<DeclarationStatement*>(stmt.get())) {
-        return handleDeclarationStatement(std::unique_ptr<DeclarationStatement>(static_cast<DeclarationStatement*>(stmt.release())), currentBlock);
-    } else if (Assignment* assign = dynamic_cast<Assignment*>(stmt.get())) {
-        return handleAssignment(std::unique_ptr<Assignment>(static_cast<Assignment*>(stmt.release())), currentBlock);
-    } else if (TestStatement* testStmt = dynamic_cast<TestStatement*>(stmt.get())) {
-        return handleTestStatement(std::unique_ptr<TestStatement>(static_cast<TestStatement*>(stmt.release())), currentBlock);
-    } else if (ResultisStatement* resultis = dynamic_cast<ResultisStatement*>(stmt.get())) {
-        return handleResultisStatement(std::unique_ptr<ResultisStatement>(static_cast<ResultisStatement*>(stmt.release())), currentBlock);
-    } else if (EndcaseStatement* endcase = dynamic_cast<EndcaseStatement*>(stmt.get())) {
-        return handleEndcaseStatement(std::unique_ptr<EndcaseStatement>(static_cast<EndcaseStatement*>(stmt.release())), currentBlock);
-    } else if (FinishStatement* finish = dynamic_cast<FinishStatement*>(stmt.get())) {
-        return handleFinishStatement(std::unique_ptr<FinishStatement>(static_cast<FinishStatement*>(stmt.release())), currentBlock);
+    if (CompoundStatement* compound = dynamic_cast<CompoundStatement*>(stmt)) {
+        return handleCompoundStatement(compound, currentBlock);
+    } else if (IfStatement* ifStmt = dynamic_cast<IfStatement*>(stmt)) {
+        return handleIfStatement(ifStmt, currentBlock);
+    } else if (WhileStatement* whileStmt = dynamic_cast<WhileStatement*>(stmt)) {
+        return handleWhileStatement(whileStmt, currentBlock);
+    } else if (ForStatement* forStmt = dynamic_cast<ForStatement*>(stmt)) {
+        return handleForStatement(forStmt, currentBlock);
+    } else if (RoutineCall* routineCall = dynamic_cast<RoutineCall*>(stmt)) {
+        return handleRoutineCall(routineCall, currentBlock);
+    } else if (ReturnStatement* ret = dynamic_cast<ReturnStatement*>(stmt)) {
+        return handleReturnStatement(ret, currentBlock);
+    } else if (LoopStatement* loop = dynamic_cast<LoopStatement*>(stmt)) {
+        return handleLoopStatement(loop, currentBlock);
+    } else if (RepeatStatement* repeat = dynamic_cast<RepeatStatement*>(stmt)) {
+        return handleRepeatStatement(repeat, currentBlock);
+    } else if (SwitchonStatement* switchon = dynamic_cast<SwitchonStatement*>(stmt)) {
+        return handleSwitchonStatement(switchon, currentBlock);
+    } else if (GotoStatement* gotoStmt = dynamic_cast<GotoStatement*>(stmt)) {
+        return handleGotoStatement(gotoStmt, currentBlock);
+    } else if (LabeledStatement* labeledStmt = dynamic_cast<LabeledStatement*>(stmt)) {
+        return handleLabeledStatement(labeledStmt, currentBlock);
+    } else if (DeclarationStatement* declStmt = dynamic_cast<DeclarationStatement*>(stmt)) {
+        return handleDeclarationStatement(declStmt, currentBlock);
+    } else if (Assignment* assign = dynamic_cast<Assignment*>(stmt)) {
+        return handleAssignment(assign, currentBlock);
+    } else if (TestStatement* testStmt = dynamic_cast<TestStatement*>(stmt)) {
+        return handleTestStatement(testStmt, currentBlock);
+    } else if (ResultisStatement* resultis = dynamic_cast<ResultisStatement*>(stmt)) {
+        return handleResultisStatement(resultis, currentBlock);
+    } else if (EndcaseStatement* endcase = dynamic_cast<EndcaseStatement*>(stmt)) {
+        return handleEndcaseStatement(endcase, currentBlock);
+    } else if (FinishStatement* finish = dynamic_cast<FinishStatement*>(stmt)) {
+        return handleFinishStatement(finish, currentBlock);
     } else {
         // Default: add statement to current block and continue
-        return addStatementToBlock(std::move(stmt), currentBlock);
+        return addStatementToBlock(stmt, currentBlock);
     }
 }
 
 // --- Specific Statement Handlers ---
 
-BasicBlock::Ptr CFGBuilder::handleCompoundStatement(std::unique_ptr<CompoundStatement> stmt, BasicBlock::Ptr currentBlock) {
-    CompoundStatement* rawStmt = stmt.get();
+BasicBlock::Ptr CFGBuilder::handleCompoundStatement(CompoundStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling CompoundStatement in " << currentBlock->toString() << "\n";
 
-    for (auto& s_node_ptr : rawStmt->statements) { // s_node_ptr is std::unique_ptr<Node>&
-        std::unique_ptr<Statement> s_stmt_ptr(static_cast<Statement*>(s_node_ptr.release()));
-        currentBlock = buildCFGForStatement(std::move(s_stmt_ptr), currentBlock);
+    for (auto& s_node_ptr : stmt->statements) { 
+        currentBlock = buildCFGForStatement(static_cast<Statement*>(s_node_ptr.get()), currentBlock);
     }
     return currentBlock;
 }
 
-BasicBlock::Ptr CFGBuilder::handleIfStatement(std::unique_ptr<IfStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleIfStatement(IfStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling IfStatement in " << currentBlock->toString() << "\n";
     // Add the if condition to the current block
-    currentBlock = addStatementToBlock(std::move(stmt), currentBlock);
+    currentBlock = addStatementToBlock(stmt, currentBlock);
 
     // Create blocks for then branch
     BasicBlock::Ptr thenBlock = createNewBlock();
 
     // Connect current block to then block
     currentBlock->addSuccessor(thenBlock);
+    std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << thenBlock->toString() << " (then branch)\n";
 
     // Build CFG for then branch
-    BasicBlock::Ptr thenEndBlock = buildCFGForStatement(std::move(stmt->then_statement), thenBlock);
+    BasicBlock::Ptr thenEndBlock = buildCFGForStatement(stmt->then_statement.get(), thenBlock);
 
     // Create a merge block
     BasicBlock::Ptr mergeBlock = createNewBlock();
 
     // Connect end of then branch to merge block
     thenEndBlock->addSuccessor(mergeBlock);
+    std::cout << "CFGBuilder: " << thenEndBlock->toString() << " -> " << mergeBlock->toString() << " (merge)\n";
 
     // If no else branch, current block also connects to merge block
     currentBlock->addSuccessor(mergeBlock);
+    std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << mergeBlock->toString() << " (no else branch)\n";
 
     return mergeBlock;
 }
 
-BasicBlock::Ptr CFGBuilder::handleWhileStatement(std::unique_ptr<WhileStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleWhileStatement(WhileStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling WhileStatement in " << currentBlock->toString() << "\n";
     // Create a block for the loop header (condition)
     BasicBlock::Ptr loopHeaderBlock = createNewBlock();
     currentBlock->addSuccessor(loopHeaderBlock);
+    std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << loopHeaderBlock->toString() << " (loop header)\n";
 
     // Add condition to loop header
-    currentBlock = addStatementToBlock(std::move(stmt), loopHeaderBlock);
+    currentBlock = addStatementToBlock(stmt, loopHeaderBlock);
 
     // Create block for loop body
     BasicBlock::Ptr loopBodyBlock = createNewBlock();
     loopHeaderBlock->addSuccessor(loopBodyBlock);
+    std::cout << "CFGBuilder: " << loopHeaderBlock->toString() << " -> " << loopBodyBlock->toString() << " (loop body)\n";
 
     // Build CFG for loop body
-    BasicBlock::Ptr bodyEndBlock = buildCFGForStatement(std::move(stmt->body), loopBodyBlock);
+    BasicBlock::Ptr bodyEndBlock = buildCFGForStatement(stmt->body.get(), loopBodyBlock);
 
     // Connect end of body back to loop header
     bodyEndBlock->addSuccessor(loopHeaderBlock);
+    std::cout << "CFGBuilder: " << bodyEndBlock->toString() << " -> " << loopHeaderBlock->toString() << " (loop backedge)\n";
 
     // Create exit block for the loop
     BasicBlock::Ptr exitBlock = createNewBlock();
     loopHeaderBlock->addSuccessor(exitBlock); // Condition can lead to exit
+    std::cout << "CFGBuilder: " << loopHeaderBlock->toString() << " -> " << exitBlock->toString() << " (loop exit)\n";
 
     return exitBlock;
 }
 
-BasicBlock::Ptr CFGBuilder::handleForStatement(std::unique_ptr<ForStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleForStatement(ForStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling ForStatement in " << currentBlock->toString() << "\n";
     // For statement is complex: initialization, condition, increment, body
 
     // Initialization part (part of current block or new block)
-    currentBlock = addStatementToBlock(std::move(stmt), currentBlock); // Add the for statement itself
+    currentBlock = addStatementToBlock(stmt, currentBlock); // Add the for statement itself
 
     // Loop header (condition check)
     BasicBlock::Ptr loopHeaderBlock = createNewBlock();
     currentBlock->addSuccessor(loopHeaderBlock);
+    std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << loopHeaderBlock->toString() << " (for loop header)\n";
 
     // Loop body
     BasicBlock::Ptr loopBodyBlock = createNewBlock();
     loopHeaderBlock->addSuccessor(loopBodyBlock);
+    std::cout << "CFGBuilder: " << loopHeaderBlock->toString() << " -> " << loopBodyBlock->toString() << " (for loop body)\n";
 
     // Build CFG for loop body
-    BasicBlock::Ptr bodyEndBlock = buildCFGForStatement(std::move(stmt->body), loopBodyBlock);
+    BasicBlock::Ptr bodyEndBlock = buildCFGForStatement(stmt->body.get(), loopBodyBlock);
 
     // Increment part (after body, before next condition check)
     // For simplicity, we'll assume increment is part of the body's end block or a new block leading to header
     // A more precise CFG would have a dedicated increment block.
     bodyEndBlock->addSuccessor(loopHeaderBlock);
+    std::cout << "CFGBuilder: " << bodyEndBlock->toString() << " -> " << loopHeaderBlock->toString() << " (for loop backedge)\n";
 
     // Exit block
     BasicBlock::Ptr exitBlock = createNewBlock();
     loopHeaderBlock->addSuccessor(exitBlock);
+    std::cout << "CFGBuilder: " << loopHeaderBlock->toString() << " -> " << exitBlock->toString() << " (for loop exit)\n";
 
     return exitBlock;
 }
 
-BasicBlock::Ptr CFGBuilder::handleRoutineCall(std::unique_ptr<RoutineCall> stmt, BasicBlock::Ptr currentBlock) {
-    return addStatementToBlock(std::move(stmt), currentBlock);
+BasicBlock::Ptr CFGBuilder::handleRoutineCall(RoutineCall* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling RoutineCall in " << currentBlock->toString() << "\n";
+    return addStatementToBlock(stmt, currentBlock);
 }
 
-BasicBlock::Ptr CFGBuilder::handleReturnStatement(std::unique_ptr<ReturnStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleReturnStatement(ReturnStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling ReturnStatement in " << currentBlock->toString() << "\n";
     // Return statement terminates the current control flow path
-    currentBlock = addStatementToBlock(std::move(stmt), currentBlock);
+    currentBlock = addStatementToBlock(stmt, currentBlock);
     // No successors from a return statement within the function's CFG
     return nullptr; // Indicates that this path is terminated
 }
 
-BasicBlock::Ptr CFGBuilder::handleLoopStatement(std::unique_ptr<LoopStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleLoopStatement(LoopStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling LoopStatement in " << currentBlock->toString() << "\n";
     // Add the LOOP statement itself to the current block
-    currentBlock = addStatementToBlock(std::move(stmt), currentBlock);
+    currentBlock = addStatementToBlock(stmt, currentBlock);
 
     // Create a block for the loop header (where control re-enters)
     BasicBlock::Ptr loopHeaderBlock = createNewBlock();
     currentBlock->addSuccessor(loopHeaderBlock);
+    std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << loopHeaderBlock->toString() << " (loop header)\n";
 
     // The body of the LOOP statement is not directly part of the LoopStatement AST node.
     // It's usually the next statement in the sequence.
@@ -209,62 +229,73 @@ BasicBlock::Ptr CFGBuilder::handleLoopStatement(std::unique_ptr<LoopStatement> s
     return loopHeaderBlock; // The loop itself is a continuous block, control flow exits via EXIT/FINISH
 }
 
-BasicBlock::Ptr CFGBuilder::handleRepeatStatement(std::unique_ptr<RepeatStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleRepeatStatement(RepeatStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling RepeatStatement in " << currentBlock->toString() << "\n";
     // REPEAT ... UNTIL is a post-test loop
 
     // Create block for loop body
     BasicBlock::Ptr loopBodyBlock = createNewBlock();
     currentBlock->addSuccessor(loopBodyBlock);
+    std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << loopBodyBlock->toString() << " (repeat loop body)\n";
 
     // Build CFG for loop body
-    BasicBlock::Ptr bodyEndBlock = buildCFGForStatement(std::move(stmt->body), loopBodyBlock);
+    BasicBlock::Ptr bodyEndBlock = buildCFGForStatement(stmt->body.get(), loopBodyBlock);
 
     // Add condition to bodyEndBlock
-    bodyEndBlock = addStatementToBlock(std::move(stmt), bodyEndBlock); // The UNTIL condition is part of the last block of the body
+    bodyEndBlock = addStatementToBlock(stmt, bodyEndBlock); // The UNTIL condition is part of the last block of the body
 
     // Create exit block
     BasicBlock::Ptr exitBlock = createNewBlock();
 
     // Connect bodyEndBlock to itself (for repeat) and to exitBlock (for until condition met)
     bodyEndBlock->addSuccessor(loopBodyBlock); // Loop back
+    std::cout << "CFGBuilder: " << bodyEndBlock->toString() << " -> " << loopBodyBlock->toString() << " (repeat loop backedge)\n";
     bodyEndBlock->addSuccessor(exitBlock);     // Exit condition
+    std::cout << "CFGBuilder: " << bodyEndBlock->toString() << " -> " << exitBlock->toString() << " (repeat loop exit)\n";
 
     return exitBlock;
 }
 
-BasicBlock::Ptr CFGBuilder::handleSwitchonStatement(std::unique_ptr<SwitchonStatement> stmt, BasicBlock::Ptr currentBlock) {
-    currentBlock = addStatementToBlock(std::move(stmt), currentBlock);
+BasicBlock::Ptr CFGBuilder::handleSwitchonStatement(SwitchonStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling SwitchonStatement in " << currentBlock->toString() << "\n";
+    currentBlock = addStatementToBlock(stmt, currentBlock);
 
     BasicBlock::Ptr mergeBlock = createNewBlock();
 
     // Access cases and default_case from the raw pointer after moving stmt
-    SwitchonStatement* rawStmt = stmt.get();
+    SwitchonStatement* rawStmt = stmt;
 
     for (auto& scase : rawStmt->cases) {
         BasicBlock::Ptr caseBlock = createNewBlock();
         currentBlock->addSuccessor(caseBlock);
-        BasicBlock::Ptr caseEndBlock = buildCFGForStatement(std::move(scase.statement), caseBlock);
+        std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << caseBlock->toString() << " (switch case)\n";
+        BasicBlock::Ptr caseEndBlock = buildCFGForStatement(scase.statement.get(), caseBlock);
         caseEndBlock->addSuccessor(mergeBlock);
+        std::cout << "CFGBuilder: " << caseEndBlock->toString() << " -> " << mergeBlock->toString() << " (switch merge)\n";
     }
 
     if (rawStmt->default_case) {
         BasicBlock::Ptr defaultBlock = createNewBlock();
         currentBlock->addSuccessor(defaultBlock);
-        BasicBlock::Ptr defaultEndBlock = buildCFGForStatement(std::move(rawStmt->default_case), defaultBlock);
+        std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << defaultBlock->toString() << " (switch default)\n";
+        BasicBlock::Ptr defaultEndBlock = buildCFGForStatement(rawStmt->default_case.get(), defaultBlock);
         defaultEndBlock->addSuccessor(mergeBlock);
+        std::cout << "CFGBuilder: " << defaultEndBlock->toString() << " -> " << mergeBlock->toString() << " (switch merge)\n";
     }
 
     return mergeBlock;
 }
 
-BasicBlock::Ptr CFGBuilder::handleGotoStatement(std::unique_ptr<GotoStatement> stmt, BasicBlock::Ptr currentBlock) {
-    currentBlock = addStatementToBlock(std::move(stmt), currentBlock);
+BasicBlock::Ptr CFGBuilder::handleGotoStatement(GotoStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling GotoStatement in " << currentBlock->toString() << "\n";
+    currentBlock = addStatementToBlock(stmt, currentBlock);
     // GOTO requires resolution of labels after all blocks are created.
     // For now, it terminates the current path. Label resolution will connect it later.
     return nullptr;
 }
 
-BasicBlock::Ptr CFGBuilder::handleLabeledStatement(std::unique_ptr<LabeledStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleLabeledStatement(LabeledStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling LabeledStatement in " << currentBlock->toString() << "\n";
     // A labeled statement can be a target of a GOTO.
     // Create a new block for the labeled statement if the current block is not empty
     // or if it's the start of a function.
@@ -273,26 +304,30 @@ BasicBlock::Ptr CFGBuilder::handleLabeledStatement(std::unique_ptr<LabeledStatem
 
     if (currentBlock) {
         currentBlock->addSuccessor(labeledBlock);
+        std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << labeledBlock->toString() << " (labeled statement)\n";
     }
 
     // Continue building CFG from the labeled statement's body
-    return buildCFGForStatement(std::move(stmt->statement), labeledBlock);
+    return buildCFGForStatement(stmt->statement.get(), labeledBlock);
 }
 
-BasicBlock::Ptr CFGBuilder::handleDeclarationStatement(std::unique_ptr<DeclarationStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleDeclarationStatement(DeclarationStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling DeclarationStatement in " << currentBlock->toString() << "\n";
     // Declarations are typically sequential and don't alter control flow directly.
     // However, initializers might contain expressions that need to be evaluated.
     // For simplicity, treat as a regular statement within the current block.
-    return addStatementToBlock(std::move(stmt), currentBlock);
+    return addStatementToBlock(stmt, currentBlock);
 }
 
-BasicBlock::Ptr CFGBuilder::handleAssignment(std::unique_ptr<Assignment> stmt, BasicBlock::Ptr currentBlock) {
-    return addStatementToBlock(std::move(stmt), currentBlock);
+BasicBlock::Ptr CFGBuilder::handleAssignment(Assignment* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling Assignment in " << currentBlock->toString() << "\n";
+    return addStatementToBlock(stmt, currentBlock);
 }
 
-BasicBlock::Ptr CFGBuilder::handleTestStatement(std::unique_ptr<TestStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleTestStatement(TestStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling TestStatement in " << currentBlock->toString() << "\n";
     // TEST is similar to IF, but with an OR branch
-    currentBlock = addStatementToBlock(std::move(stmt), currentBlock);
+    currentBlock = addStatementToBlock(stmt, currentBlock);
 
     BasicBlock::Ptr thenBlock = createNewBlock();
     BasicBlock::Ptr elseBlock = nullptr;
@@ -301,41 +336,49 @@ BasicBlock::Ptr CFGBuilder::handleTestStatement(std::unique_ptr<TestStatement> s
     }
 
     currentBlock->addSuccessor(thenBlock);
+    std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << thenBlock->toString() << " (test then branch)\n";
     if (elseBlock) {
         currentBlock->addSuccessor(elseBlock);
+        std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << elseBlock->toString() << " (test else branch)\n";
     }
 
-    BasicBlock::Ptr thenEndBlock = buildCFGForStatement(std::move(stmt->then_statement), thenBlock);
+    BasicBlock::Ptr thenEndBlock = buildCFGForStatement(stmt->then_statement.get(), thenBlock);
     BasicBlock::Ptr elseEndBlock = nullptr;
     if (stmt->else_statement) {
-        elseEndBlock = buildCFGForStatement(std::move(stmt->else_statement), elseBlock);
+        elseEndBlock = buildCFGForStatement(stmt->else_statement.get(), elseBlock);
     }
 
     BasicBlock::Ptr mergeBlock = createNewBlock();
 
     thenEndBlock->addSuccessor(mergeBlock);
+    std::cout << "CFGBuilder: " << thenEndBlock->toString() << " -> " << mergeBlock->toString() << " (test merge)\n";
     if (elseEndBlock) {
         elseEndBlock->addSuccessor(mergeBlock);
+        std::cout << "CFGBuilder: " << elseEndBlock->toString() << " -> " << mergeBlock->toString() << " (test merge)\n";
     } else {
         currentBlock->addSuccessor(mergeBlock);
+        std::cout << "CFGBuilder: " << currentBlock->toString() << " -> " << mergeBlock->toString() << " (test merge, no else)\n";
     }
 
     return mergeBlock;
 }
 
-BasicBlock::Ptr CFGBuilder::handleResultisStatement(std::unique_ptr<ResultisStatement> stmt, BasicBlock::Ptr currentBlock) {
-    return addStatementToBlock(std::move(stmt), currentBlock);
+BasicBlock::Ptr CFGBuilder::handleResultisStatement(ResultisStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling ResultisStatement in " << currentBlock->toString() << "\n";
+    return addStatementToBlock(stmt, currentBlock);
 }
 
-BasicBlock::Ptr CFGBuilder::handleEndcaseStatement(std::unique_ptr<EndcaseStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleEndcaseStatement(EndcaseStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling EndcaseStatement in " << currentBlock->toString() << "\n";
     // ENDCASE typically jumps to the end of the enclosing SWITCHON statement.
     // This requires context of the enclosing SWITCHON, which is not directly available here.
     // For now, treat it as terminating the current path, similar to GOTO.
-    return addStatementToBlock(std::move(stmt), currentBlock);
+    return addStatementToBlock(stmt, currentBlock);
 }
 
-BasicBlock::Ptr CFGBuilder::handleFinishStatement(std::unique_ptr<FinishStatement> stmt, BasicBlock::Ptr currentBlock) {
+BasicBlock::Ptr CFGBuilder::handleFinishStatement(FinishStatement* stmt, BasicBlock::Ptr currentBlock) {
+    std::cout << "CFGBuilder: Handling FinishStatement in " << currentBlock->toString() << "\n";
     // FINISH terminates the program or current routine.
-    currentBlock = addStatementToBlock(std::move(stmt), currentBlock);
+    currentBlock = addStatementToBlock(stmt, currentBlock);
     return nullptr; // Terminates the path
 }

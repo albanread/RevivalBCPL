@@ -119,6 +119,10 @@ void DebugPrinter::visit(Node* node, int indent_level) {
     else if (auto* n = dynamic_cast<ResultisStatement*>(node)) visit(n, indent_level);
     else if (auto* n = dynamic_cast<SwitchonStatement*>(node)) visit(n, indent_level);
     else if (auto* n = dynamic_cast<EndcaseStatement*>(node)) visit(n, indent_level);
+    else if (auto* n = dynamic_cast<VectorConstructor*>(node)) visit(n, indent_level);
+    else if (auto* n = dynamic_cast<VectorAccess*>(node)) visit(n, indent_level);
+    else if (auto* n = dynamic_cast<DeclarationStatement*>(node)) visit(n, indent_level);
+
     else std::cout << "Unknown AST Node" << std::endl;
 }
 
@@ -309,4 +313,23 @@ void DebugPrinter::visit(SwitchonStatement* node, int i) {
 
 void DebugPrinter::visit(EndcaseStatement* node, int i) {
     indent(i); std::cout << "EndcaseStatement" << std::endl;
+}
+
+void DebugPrinter::visit(VectorConstructor* node, int i) {
+    indent(i); std::cout << "VectorConstructor" << std::endl;
+    indent(i + 1); std::cout << "Size:" << std::endl;
+    visit(node->size.get(), i + 2);
+}
+
+void DebugPrinter::visit(VectorAccess* node, int i) {
+    indent(i); std::cout << "VectorAccess" << std::endl;
+    indent(i + 1); std::cout << "Vector:" << std::endl;
+    visit(node->vector.get(), i + 2);
+    indent(i + 1); std::cout << "Index:" << std::endl;
+    visit(node->index.get(), i + 2);
+}
+
+void DebugPrinter::visit(DeclarationStatement* node, int i) {
+    // This node is just a wrapper, so we visit the actual declaration inside it.
+    visit(node->declaration.get(), i);
 }

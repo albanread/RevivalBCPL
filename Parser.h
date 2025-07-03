@@ -47,7 +47,7 @@ private:
     void expect(TokenType type, const std::string& message);
 
     // --- Parsing Methods for different grammar rules ---
-    
+
     // Declarations
     DeclPtr parseDeclaration();
     DeclPtr parseLetDeclaration();
@@ -72,9 +72,10 @@ private:
     StmtPtr parseLabeledStatement(const std::string& label_name);
     StmtPtr parseExpressionStatement(); // For routine calls and assignments
     Assignment* parseAssignment(ExprPtr first_lhs);
-    
+
     // Expressions (using Pratt parsing or precedence climbing)
     ExprPtr parseExpression(int precedence = 0);
+    ExprPtr parseExpression(int precedence, ExprPtr lhs);
     ExprPtr parsePrimaryExpression();
     ExprPtr parseIdentifierExpression();
     ExprPtr parseParenExpression();
@@ -88,4 +89,3 @@ private:
 };
 
 #endif // PARSER_H
-

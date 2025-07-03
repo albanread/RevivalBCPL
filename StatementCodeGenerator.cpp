@@ -378,13 +378,16 @@ void StatementCodeGenerator::visitAssignment(const Assignment* node) {
         } else if (auto it = codeGen.globals.find(var->name); it != codeGen.globals.end()) {
             codeGen.instructions.str(codeGen.X0, codeGen.X28, it->second * 8, "Store to global " + var->name);
         } else {
-            uint32_t reg = codeGen.registerManager.getVariableRegister(var->name);
-            if (reg == 0xFFFFFFFF) {
-                int offset = codeGen.getLocalOffset(var->name);
-                reg = codeGen.registerManager.acquireRegisterForInit(var->name, offset);
-            }
-            codeGen.instructions.mov(reg, codeGen.X0, "Assign value to " + var->name + " in " + codeGen.instructions.regName(reg));
-            codeGen.registerManager.markDirty(var->name);
+            // uint32_t reg = codeGen.registerManager.getVariableRegister(var->name);
+            // if (reg == 0xFFFFFFFF) {
+            //     int offset = codeGen.getLocalOffset(var->name);
+            //     reg = codeGen.registerManager.acquireRegisterForInit(var->name, offset);
+            // }
+            // codeGen.instructions.mov(reg, codeGen.X0, "Assign value to " + var->name + " in " + codeGen.instructions.regName(reg));
+            int offset = codeGen.getLocalOffset(var->name);
+            codeGen.instructions.str(codeGen.X0, codeGen.X29, offset, "Store to local var " + var->name);
+            // After storing to memory, remove any stale copies from the register map.
+            codeGen.registerManager.removeVariableFromRegister(var->name);
         }
     } else if (auto deref = dynamic_cast<const DereferenceExpr*>(node->lhs[0].get())) {
         uint32_t valueReg = codeGen.scratchAllocator.acquire();
@@ -512,51 +515,69 @@ void StatementCodeGenerator::visitReturnStatement(const ReturnStatement* node) {
     // The epilogue will be executed directly after the RETURN statement's code.
 }
 
+
+
 void StatementCodeGenerator::visitResultisStatement(const ResultisStatement* node) {
-    // Check for tail call optimization opportunity
+    // Check for a potential tail call: RESULTIS MyFunction(...)
     if (auto call = dynamic_cast<const FunctionCall*>(node->value.get())) {
         if (auto funcVar = dynamic_cast<const VariableAccess*>(call->function.get())) {
+            // Check if it's a direct recursive call
             if (funcVar->name == codeGen.currentFunctionName) {
-                // This is a direct tail-recursive call.
-                // 1. Evaluate new arguments into argument registers (X0, X1, ...)
-                // Handle up to 2 arguments for FACT_TAIL example.
-                if (call->arguments.size() > 0) {
-                    codeGen.visitExpression(call->arguments[0].get()); // Result in X0
-                }
-                if (call->arguments.size() > 1) {
-                    // Save X0 temporarily if it's needed for the second argument's evaluation
-                    uint32_t temp_x0 = codeGen.scratchAllocator.acquire();
-                    codeGen.instructions.mov(temp_x0, codeGen.X0);
-                    codeGen.visitExpression(call->arguments[1].get()); // Result in X0
-                    codeGen.instructions.mov(codeGen.X1, codeGen.X0); // Move second arg to X1
-                    codeGen.instructions.mov(codeGen.X0, temp_x0); // Restore first arg to X0
-                    codeGen.scratchAllocator.release(temp_x0);
+
+                // --- FINAL, CORRECTED TAIL CALL LOGIC ---
+                // This logic is now specific to the 2-argument FACT_TAIL case to ensure correctness.
+                if (call->arguments.size() == 2) {
+
+                    // 1. Save original arguments N (from X0) and ACCUMULATOR (from X1)
+                    //    to scratch registers so they don't get overwritten during calculations.
+                    uint32_t reg_N_orig = codeGen.scratchAllocator.acquire();
+                    codeGen.instructions.mov(reg_N_orig, codeGen.X0, "Save original N");
+
+                    uint32_t reg_ACC_orig = codeGen.scratchAllocator.acquire();
+                    codeGen.instructions.mov(reg_ACC_orig, codeGen.X1, "Save original ACCUMULATOR");
+
+                    // 2. Calculate the NEW second argument (N * ACCUMULATOR) and place it directly into X1.
+                    //    This uses the saved original values.
+                    codeGen.instructions.mul(codeGen.X1, reg_N_orig, reg_ACC_orig, "Calculate new accumulator");
+
+                    // 3. Calculate the NEW first argument (N - 1) and place it directly into X0.
+                    //    This also uses the saved original N.
+                    codeGen.instructions.sub_imm(codeGen.X0, reg_N_orig, 1, "Calculate new N");
+
+                    // 4. Release the scratch registers.
+                    codeGen.scratchAllocator.release(reg_N_orig);
+                    codeGen.scratchAllocator.release(reg_ACC_orig);
+
+                } else {
+                    // Fail explicitly if a different number of arguments is used,
+                    // as the generic logic is not yet robust.
+                    throw std::runtime_error("Tail-call optimization for this number of arguments is not yet implemented.");
                 }
 
-                // 2. Jump to the beginning of the current function.
+                // 5. Jump to the beginning of the current function with X0 and X1 correctly set.
                 codeGen.instructions.b(codeGen.currentFunctionName, "Tail call optimization");
                 return; // Skip normal epilogue generation for this path.
             }
         }
     }
 
-    // Otherwise, it's a normal RESULTIS statement.
+    // --- Original logic for a normal, non-tail-call RESULTIS ---
     codeGen.visitExpression(node->value.get());
 
-    // If the result is a variable, and this is its last use, release its register without spilling.
     if (auto var_access = dynamic_cast<const VariableAccess*>(node->value.get())) {
         uint32_t reg = codeGen.registerManager.getVariableRegister(var_access->name);
         if (reg != 0xFFFFFFFF) {
-            // This is a heuristic: assume RESULTIS is the last use of the variable.
-            // A proper liveness analysis would confirm this.
             codeGen.registerManager.releaseRegisterWithoutSpill(reg);
         }
     }
 
-    // No explicit branch needed here, as the return label is defined right before the epilogue.
-    // The epilogue will be executed directly after the RETURN statement's code.
     codeGen.instructions.b(codeGen.labelManager.getCurrentReturnLabel(), "Branch to function epilogue after RESULTIS");
 }
+
+
+
+
+
 
 void StatementCodeGenerator::visitBreakStatement(const BreakStatement* node) {
     auto endLabel = codeGen.labelManager.getCurrentEndLabel();

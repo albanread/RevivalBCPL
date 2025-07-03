@@ -1,7 +1,12 @@
 #include "VariableVisitor.h"
+#include <iostream>
 
 void VariableVisitor::visit(VariableAccess* node) {
+    // Only mark as used if it's a variable access, not a routine name.
+    // This distinction might need more context (e.g., symbol table lookup).
+    // For now, assume all VariableAccess are actual variable uses.
     usedVariables.insert(node->name);
+    std::cout << "VariableVisitor: Used variable: " << node->name << "\n";
 }
 
 void VariableVisitor::visit(Assignment* node) {
@@ -9,6 +14,7 @@ void VariableVisitor::visit(Assignment* node) {
     for (const auto& lhs_expr : node->lhs) {
         if (auto varAccess = dynamic_cast<VariableAccess*>(lhs_expr.get())) {
             definedVariables.insert(varAccess->name);
+            std::cout << "VariableVisitor: Defined variable (Assignment): " << varAccess->name << "\n";
         } else {
             // For complex LHS (e.g., vector access), its components are used
             lhs_expr->accept(this);
@@ -22,6 +28,7 @@ void VariableVisitor::visit(Assignment* node) {
 void VariableVisitor::visit(LetDeclaration* node) {
     for (const auto& init : node->initializers) {
         definedVariables.insert(init.name);
+        std::cout << "VariableVisitor: Defined variable (LetDeclaration): " << init.name << "\n";
         if (init.init) {
             init.init->accept(this);
         }
@@ -30,6 +37,7 @@ void VariableVisitor::visit(LetDeclaration* node) {
 
 void VariableVisitor::visit(ForStatement* node) {
     definedVariables.insert(node->var_name);
+    std::cout << "VariableVisitor: Defined variable (ForStatement): " << node->var_name << "\n";
     node->from_expr->accept(this);
     node->to_expr->accept(this);
     if (node->by_expr) {
@@ -40,8 +48,9 @@ void VariableVisitor::visit(ForStatement* node) {
 
 void VariableVisitor::visit(FunctionDeclaration* node) {
     // Parameters are defined variables within the function's scope
-    for (const auto& param : node->params) { // Corrected from node->parameters
+    for (const auto& param : node->params) {
         definedVariables.insert(param);
+        std::cout << "VariableVisitor: Defined variable (FunctionDeclaration param): " << param << "\n";
     }
     if (node->body_stmt) {
         node->body_stmt->accept(this);
@@ -52,14 +61,27 @@ void VariableVisitor::visit(FunctionDeclaration* node) {
 }
 
 void VariableVisitor::visit(FunctionCall* node) {
+    // The function itself is used (its name)
     node->function->accept(this);
+    // Arguments are used
     for (const auto& arg : node->arguments) {
         arg->accept(this);
     }
 }
 
 void VariableVisitor::visit(RoutineCall* node) {
-    node->call_expression->accept(this);
+    // The routine name itself is not a variable, so don't add to usedVariables.
+    // However, its arguments are used.
+    if (auto funcCall = dynamic_cast<FunctionCall*>(node->call_expression.get())) {
+        // Visit arguments of the function call within the routine call
+        for (const auto& arg : funcCall->arguments) {
+            arg->accept(this);
+        }
+    }
+    // Removed: else if (auto varAccess = dynamic_cast<VariableAccess*>(node->call_expression.get())) {
+    //    usedVariables.insert(varAccess->name);
+    //    std::cout << "VariableVisitor: Used routine name: " << varAccess->name << "\n";
+    // }
 }
 
 void VariableVisitor::visit(UnaryOp* node) {
@@ -98,7 +120,6 @@ void VariableVisitor::visit(CharacterAccess* node) {
 void VariableVisitor::visit(IfStatement* node) {
     node->condition->accept(this);
     node->then_statement->accept(this);
-    // IfStatement does not have an else_statement. This is handled by TestStatement.
 }
 
 void VariableVisitor::visit(TestStatement* node) {
@@ -135,4 +156,9 @@ void VariableVisitor::visit(SwitchonStatement* node) {
 
 void VariableVisitor::visit(GotoStatement* node) {
     node->label->accept(this);
+}
+
+void VariableVisitor::visit(DeclarationStatement* node) {
+    // Visit the declaration within the statement to find defined variables
+    node->declaration->accept(this);
 }

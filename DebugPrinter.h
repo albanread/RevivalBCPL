@@ -75,6 +75,9 @@ private:
     void visit(ResultisStatement* node, int indent);
     void visit(SwitchonStatement* node, int indent);
     void visit(EndcaseStatement* node, int indent);
+    void visit(VectorConstructor* node, int indent);
+    void visit(VectorAccess* node, int indent);
+    void visit(DeclarationStatement* node, int indent);
 };
 
 #endif // DEBUG_PRINTER_H

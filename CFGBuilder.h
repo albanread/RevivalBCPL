@@ -22,9 +22,13 @@ public:
     /**
      * @brief Builds the CFG for a given program.
      * @param program The root of the AST.
-     * @return A map of function names to their entry basic blocks.
      */
-    std::map<std::string, BasicBlock::Ptr> build(ProgramPtr&& program);
+    void build(const ProgramPtr& program);
+
+    // Getter for functionEntryBlocks
+    const std::map<std::string, BasicBlock::Ptr>& getFunctionEntryBlocks() const {
+        return functionEntryBlocks;
+    }
 
 private:
     int nextBlockId;
@@ -35,29 +39,29 @@ private:
     BasicBlock::Ptr createNewBlock();
 
     // Recursive function to build CFG for a statement
-    BasicBlock::Ptr buildCFGForStatement(std::unique_ptr<Statement> stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr buildCFGForStatement(Statement* stmt, BasicBlock::Ptr currentBlock);
 
     // Specific statement handlers
-    BasicBlock::Ptr handleCompoundStatement(std::unique_ptr<CompoundStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleIfStatement(std::unique_ptr<IfStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleWhileStatement(std::unique_ptr<WhileStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleForStatement(std::unique_ptr<ForStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleRoutineCall(std::unique_ptr<RoutineCall> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleReturnStatement(std::unique_ptr<ReturnStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleLoopStatement(std::unique_ptr<LoopStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleRepeatStatement(std::unique_ptr<RepeatStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleSwitchonStatement(std::unique_ptr<SwitchonStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleGotoStatement(std::unique_ptr<GotoStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleLabeledStatement(std::unique_ptr<LabeledStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleDeclarationStatement(std::unique_ptr<DeclarationStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleAssignment(std::unique_ptr<Assignment> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleTestStatement(std::unique_ptr<TestStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleResultisStatement(std::unique_ptr<ResultisStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleEndcaseStatement(std::unique_ptr<EndcaseStatement> stmt, BasicBlock::Ptr currentBlock);
-    BasicBlock::Ptr handleFinishStatement(std::unique_ptr<FinishStatement> stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleCompoundStatement(CompoundStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleIfStatement(IfStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleWhileStatement(WhileStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleForStatement(ForStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleRoutineCall(RoutineCall* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleReturnStatement(ReturnStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleLoopStatement(LoopStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleRepeatStatement(RepeatStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleSwitchonStatement(SwitchonStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleGotoStatement(GotoStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleLabeledStatement(LabeledStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleDeclarationStatement(DeclarationStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleAssignment(Assignment* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleTestStatement(TestStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleResultisStatement(ResultisStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleEndcaseStatement(EndcaseStatement* stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr handleFinishStatement(FinishStatement* stmt, BasicBlock::Ptr currentBlock);
 
     // Helper to add a statement to the current block or start a new one if needed
-    BasicBlock::Ptr addStatementToBlock(std::unique_ptr<Statement> stmt, BasicBlock::Ptr currentBlock);
+    BasicBlock::Ptr addStatementToBlock(Statement* stmt, BasicBlock::Ptr currentBlock);
 };
 
 #endif // CFG_BUILDER_H

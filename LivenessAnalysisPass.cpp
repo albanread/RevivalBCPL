@@ -1,32 +1,43 @@
 #include "LivenessAnalysisPass.h"
 #include "VariableVisitor.h"
 #include "ExpressionLivenessVisitor.h"
+#include "CFGBuilder.h" // Include CFGBuilder
+#include "Utils.h" // Include common utility functions
 #include <algorithm> // For std::set_union, std::set_difference
 #include <iostream> // For debugging
+#include <vector>
+#include <set>
+#include <map>
 
 std::string LivenessAnalysisPass::getName() const {
     return "Liveness Analysis Pass";
 }
 
 ProgramPtr LivenessAnalysisPass::apply(ProgramPtr program) {
-    std::cout << "
-=== Liveness Analysis Pass: Starting ===" << std::endl;
+    std::cout << "\n=== Liveness Analysis Pass: Starting ===\n" << std::flush;
     // Clear previous analysis results
     liveInStatements.clear();
     liveOutStatements.clear();
     liveInExpressions.clear();
     liveOutExpressions.clear();
+    liveInBlocks.clear();
+    liveOutBlocks.clear();
 
     CFGBuilder cfgBuilder;
-    functionCFGs = cfgBuilder.build(std::move(program));
+    // Build the CFG from the program. The CFGBuilder will populate its internal functionEntryBlocks map.
+    cfgBuilder.build(program); 
+    functionCFGs = cfgBuilder.getFunctionEntryBlocks(); // CRITICAL FIX: Populate functionCFGs
 
-    // Initialize live-in and live-out for all basic blocks
-    // This will be done within the iterative analysis loop
+    std::cout << "LivenessAnalysisPass: functionCFGs size: " << functionCFGs.size() << "\n" << std::flush;
 
     // Perform iterative dataflow analysis on the CFG
     bool changed = true;
+    int iteration = 0;
     while (changed) {
         changed = false;
+        iteration++;
+        std::cout << "\n--- Liveness Analysis Iteration " << iteration << " ---\n" << std::flush;
+
         // Iterate over all functions
         for (const auto& pair : functionCFGs) {
             BasicBlock::Ptr entryBlock = pair.second;
@@ -56,6 +67,7 @@ ProgramPtr LivenessAnalysisPass::apply(ProgramPtr program) {
             std::reverse(allBlocks.begin(), allBlocks.end());
 
             for (const auto& block : allBlocks) {
+                std::cout << "  Processing Block: " << block->toString() << "\n" << std::flush;
                 // Initialize live-in and live-out for this block if not already present
                 if (liveInBlocks.find(block.get()) == liveInBlocks.end()) {
                     liveInBlocks[block.get()] = {};
@@ -95,6 +107,11 @@ ProgramPtr LivenessAnalysisPass::apply(ProgramPtr program) {
 
                 liveInBlocks[block.get()] = setUnion(blockUse, setDifference(liveOutBlocks[block.get()], blockDef));
 
+                printSet("  Block Use", blockUse);
+                printSet("  Block Def", blockDef);
+                printSet("  Block Live-In", liveInBlocks[block.get()]);
+                printSet("  Block Live-Out", liveOutBlocks[block.get()]);
+
                 if (liveInBlocks[block.get()] != oldLiveIn || liveOutBlocks[block.get()] != oldLiveOut) {
                     changed = true;
                 }
@@ -104,6 +121,7 @@ ProgramPtr LivenessAnalysisPass::apply(ProgramPtr program) {
 
     // After convergence, propagate liveness information to individual statements and expressions
     // This will require another pass over the CFG and AST.
+    std::cout << "\n--- Propagating Liveness to Statements and Expressions ---\n" << std::flush;
     for (const auto& pair : functionCFGs) {
         BasicBlock::Ptr entryBlock = pair.second;
         std::vector<BasicBlock::Ptr> allBlocks;
@@ -122,49 +140,33 @@ ProgramPtr LivenessAnalysisPass::apply(ProgramPtr program) {
             std::set<std::string> currentLiveOut = liveOutBlocks[current.get()];
             
             for (auto it = current->statements.rbegin(); it != current->statements.rend(); ++it) {
-                Statement* stmt = it->get();                liveOutStatements[stmt] = currentLiveOut;                VariableVisitor varVisitor;                stmt->accept(&varVisitor);                std::set<std::string> stmtUse = varVisitor.getUsedVariables();                std::set<std::string> stmtDef = varVisitor.getDefinedVariables();                liveInStatements[stmt] = setUnion(stmtUse, setDifference(currentLiveOut, stmtDef));                currentLiveOut = liveInStatements[stmt]; // Live-in of current becomes live-out of previous                // Propagate to expressions within the statement                ExpressionLivenessVisitor exprVisitor(liveInExpressions, liveOutExpressions, liveInStatements, liveOutStatements, liveInStatements[stmt]);                stmt->accept(&exprVisitor);                // Debugging output                std::cout << "
---- Statement Liveness ---" << std::endl;
-                std::cout << "Statement: " << stmt->toString() << std::endl;
-                std::cout << "  Live-In: {";
-                bool first = true;
-                for (const auto& var : liveInStatements[stmt]) {
-                    if (!first) std::cout << ", ";
-                    std::cout << var;
-                    first = false;
-                }
-                std::cout << "}" << std::endl;
-                std::cout << "  Live-Out: {";
-                first = true;
-                for (const auto& var : liveOutStatements[stmt]) {
-                    if (!first) std::cout << ", ";
-                    std::cout << var;
-                    first = false;
-                }
-                std::cout << "}" << std::endl;
-                std::cout << "  Use: {";
-                first = true;
-                for (const auto& var : stmtUse) {
-                    if (!first) std::cout << ", ";
-                    std::cout << var;
-                    first = false;
-                }
-                std::cout << "}" << std::endl;
-                std::cout << "  Def: {";
-                first = true;
-                for (const auto& var : stmtDef) {
-                    if (!first) std::cout << ", ";
-                    std::cout << var;
-                    first = false;
-                }
-                std::cout << "}" << std::endl;
+                Statement* stmt = *it; // Now it's a raw pointer
+                liveOutStatements[stmt] = currentLiveOut;
+                VariableVisitor varVisitor;
+                stmt->accept(&varVisitor);
+                std::set<std::string> stmtUse = varVisitor.getUsedVariables();
+                std::set<std::string> stmtDef = varVisitor.getDefinedVariables();
+                liveInStatements[stmt] = setUnion(stmtUse, setDifference(currentLiveOut, stmtDef));
+                currentLiveOut = liveInStatements[stmt]; // Live-in of current becomes live-out of previous
+
+                // Propagate to expressions within the statement
+                ExpressionLivenessVisitor exprVisitor(liveInExpressions, liveOutExpressions, liveInStatements, liveOutStatements, liveInStatements[stmt]);
+                stmt->accept(&exprVisitor);
+
+                // Debugging output for statements
+                std::cout << "\n--- Statement Liveness ---\n" << std::flush;
+                // std::cout << "Statement: " << stmt->toString() << "\n" << std::flush; // Removed: Statement does not have toString()
+                printSet("Live-In", liveInStatements[stmt]);
+                printSet("Live-Out", liveOutStatements[stmt]);
+                printSet("Use", stmtUse);
+                printSet("Def", stmtDef);
             }
         }
     }
 
-    std::cout << "
-=== Liveness Analysis Pass: Finished ===" << std::endl;
+    std::cout << "\n=== Liveness Analysis Pass: Finished ===\n" << std::flush;
     // Return the original program, as this pass only analyzes, not transforms.
-    return program;
+    return program; // Return the original program, as CFGBuilder now takes a const ref.
 }
 
 // --- Public Accessors ---
@@ -218,4 +220,3 @@ std::set<std::string> LivenessAnalysisPass::setDifference(const std::set<std::st
                         std::inserter(result, result.begin()));
     return result;
 }
-

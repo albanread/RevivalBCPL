@@ -20,8 +20,8 @@ public:
     // Unique identifier for the basic block
     int id;
 
-    // Statements contained within this basic block
-    std::vector<StmtPtr> statements;
+    // Statements contained within this basic block (now raw pointers)
+    std::vector<Statement*> statements;
 
     // Successor basic blocks
     std::set<Ptr> successors;
@@ -32,9 +32,9 @@ public:
     // Constructor
     BasicBlock(int block_id) : id(block_id) {}
 
-    // Add a statement to the basic block
-    void addStatement(StmtPtr&& stmt) {
-        statements.push_back(std::move(stmt));
+    // Add a statement to the basic block (now takes raw pointer)
+    void addStatement(Statement* stmt) {
+        statements.push_back(stmt);
     }
 
     // Add a successor basic block

@@ -98,7 +98,9 @@ void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
 
     switch (node->op) {
         case TokenType::OpPlus:
-            codeGen.instructions.add(codeGen.X0, lhs_reg, rhs_reg, "Addition");
+            //codeGen.instructions.add(codeGen.X0, lhs_reg, rhs_reg, "Addition");
+            codeGen.instructions.add(codeGen.X0, lhs_reg, rhs_reg, AArch64Instructions::LSL, 0, "Addition");
+
             break;
         case TokenType::OpMinus:
             codeGen.instructions.sub(codeGen.X0, lhs_reg, rhs_reg, "Subtraction");
@@ -163,7 +165,10 @@ void ExpressionCodeGenerator::visitBinaryOp(const BinaryOp* node) {
             codeGen.instructions.orr(codeGen.X0, lhs_reg, rhs_reg, "Bitwise OR");
             break;
         case TokenType::OpLshift:
-            codeGen.instructions.lsl(codeGen.X0, lhs_reg, rhs_reg, "Logical Left Shift");
+            //codeGen.instructions.lsl(codeGen.X0, lhs_reg, rhs_reg, "Logical Left Shift");
+            // Use LSLV to shift by the value in a register
+            codeGen.instructions.lslv(codeGen.X0, lhs_reg, rhs_reg, "Logical Left Shift (Variable)");
+
             break;
         case TokenType::OpRshift:
             codeGen.instructions.lsr(codeGen.X0, lhs_reg, rhs_reg, "Logical Right Shift");
@@ -307,4 +312,30 @@ void ExpressionCodeGenerator::visitStringAccess(const StringAccess* node) {
     // or by visitCharacterAccess for indexed access.
     // If this is meant for something else, it needs further implementation.
     throw std::runtime_error("ExpressionCodeGenerator::visitStringAccess not implemented for this context.");
+}
+
+// (Add this function at the end of the file with the other method implementations)
+
+void ExpressionCodeGenerator::visitVectorAccess(const VectorAccess* node) {
+    // 1. Evaluate the index expression. The result will be in X0.
+    codeGen.visitExpression(node->index.get());
+
+    // 2. Acquire a scratch register and save the index value into it.
+    uint32_t indexReg = codeGen.scratchAllocator.acquire();
+    codeGen.instructions.mov(indexReg, codeGen.X0, "Save index value");
+
+    // 3. Evaluate the vector expression to get its base address in X0.
+    codeGen.visitExpression(node->vector.get());
+    uint32_t vectorBaseReg = codeGen.X0; // Base address is now in X0
+
+    // 4. Calculate the final element's address.
+    // Address = Base Address + (Index * 8)
+    // The LSL #3 is a "Logical Shift Left" by 3 bits, which is a fast way to multiply by 8 (the size of each element).
+    codeGen.instructions.add(vectorBaseReg, vectorBaseReg, indexReg, AArch64Instructions::LSL, 3, "Calculate vector element address");
+
+    // 5. Load the value from the calculated address into X0.
+    codeGen.instructions.ldr(codeGen.X0, vectorBaseReg, 0, "Load vector element value");
+
+    // 6. Release the scratch register.
+    codeGen.scratchAllocator.release(indexReg);
 }

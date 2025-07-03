@@ -25,10 +25,10 @@ void Optimizer::setupDefaultPasses() {
     passManager.addPass(std::make_unique<RepeatUntilOptimizationPass>(manifests));
     passManager.addPass(std::make_unique<LoopInvariantCodeMotionPass>(manifests));
 //    passManager.addPass(std::make_unique<CommonSubexpressionEliminationPass>());
-    auto livenessPass = std::make_unique<LivenessAnalysisPass>();
-    LivenessAnalysisPass* livenessPassPtr = livenessPass.get();
-    passManager.addPass(std::move(livenessPass)); // Add LivenessAnalysisPass
-    passManager.addPass(std::make_unique<DeadCodeEliminationPass>(livenessPassPtr));
+//    auto livenessPass = std::make_unique<LivenessAnalysisPass>();
+//    LivenessAnalysisPass* livenessPassPtr = livenessPass.get();
+//    passManager.addPass(std::move(livenessPass)); // Add LivenessAnalysisPass
+//    passManager.addPass(std::make_unique<DeadCodeEliminationPass>(livenessPassPtr));
 }
 
 ProgramPtr Optimizer::optimize(ProgramPtr ast) {

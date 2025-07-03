@@ -16,7 +16,7 @@ CodeGenerator::CodeGenerator() : instructions(), labelManager(), scratchAllocato
     for (uint32_t i = 19; i <= 28; ++i) {
         calleeSavedRegs.push_back(i);
     }
-    
+
     // Initialize specialized code generators
     statementGenerator = std::make_unique<StatementCodeGenerator>(*this);
     expressionGenerator = std::make_unique<ExpressionCodeGenerator>(*this);
@@ -154,6 +154,8 @@ void CodeGenerator::visitExpression(const Expression* expr) {
         expressionGenerator->visitVectorConstructor(vec);
     } else if (auto* charAccess = dynamic_cast<const CharacterAccess*>(expr)) {
         expressionGenerator->visitCharacterAccess(charAccess);
+    } else if (auto* vecAccess = dynamic_cast<const VectorAccess*>(expr)) {
+        expressionGenerator->visitVectorAccess(vecAccess);
     }
 }
 
@@ -176,7 +178,7 @@ void CodeGenerator::resolveLabels() {
 void CodeGenerator::finalizeInstructionAddressing(size_t baseAddress) {
     // Step 1: Compute addresses for all instructions
     instructions.computeAddresses(baseAddress);
-    
+
     // Step 2: Resolve all branch targets using the new instruction-based resolution
     instructions.resolveAllBranches();
 }
@@ -315,4 +317,3 @@ void CodeGenerator::printAsm() const {
     std::cout << assemblyListing.str();
     std::cout << "\n;------------ End of Assembly ------------\n\n";
 }
-
